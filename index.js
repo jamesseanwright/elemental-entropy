@@ -1,3 +1,3 @@
 'use strict';
 
-console.log(window);
+console.log(window.c);

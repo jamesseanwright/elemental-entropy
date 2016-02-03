@@ -9,7 +9,7 @@
 
 var PI = Math.PI;
 
-var Paddle = {
+var shield = {
 	init: function () {
 		this.rotation = 0;
 		this.x = a.width / 2;
@@ -40,8 +40,8 @@ var Paddle = {
 	}
 };
 
-Paddle.render = requestAnimationFrame(Paddle.render);
-Paddle.init();
+shield.render = requestAnimationFrame(shield.render);
+shield.init();
 
 drawFire();
 

@@ -33,7 +33,7 @@ var shield = {
 			this.y + this.radius
 		);
 
-		c.strokeStyle = 'black';
+		c.strokeStyle = 'white';
 		c.beginPath();
 		c.arc(this.x, this.y, this.radius, PI - this.rotation, (PI + PI) - this.rotation);
 		c.stroke();

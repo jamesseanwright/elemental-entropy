@@ -25,9 +25,7 @@ var shield = {
 	
 	rotate: function (e) {
 		var centre = a.width / 2;
-
 		this.rotation = (PI - ((e.clientX - centre) / PI)) / 100;
-		console.log(this.rotation);
 	},
 
 	render: function () {

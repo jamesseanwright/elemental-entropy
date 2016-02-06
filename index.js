@@ -57,7 +57,7 @@ var fire = {
 		c.beginPath();
 		c.moveTo(this.x, this.y + this.height);
 		c.lineTo(this.x + this.width / 2, this.y);
-		c.lineTo(this.width, this.y + this.height);
+		c.lineTo(this.x + this.width, this.y + this.height);
 		c.lineTo(this.x, this.y + this.height);
 		c.fillStyle = this.fill;
 		c.fill();

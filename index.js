@@ -14,8 +14,8 @@ var shield = {
 		this.rotation = 0;
 		this.x = a.width / 2;
 		this.y = a.height / 2;
-		this.radianModifier = 0.6;
-		this.radius = 80;
+		this.radianModifier = 1;
+		this.radius = 85;
 		this.stroke = 'white';
 
 		a.addEventListener('mousemove', function (e) { 
@@ -50,8 +50,9 @@ var fire = {
 		this.width = 90;
 		this.height = 80;
 		this.x = a.width / 2 - this.width / 2;
-		this.y = (a.height - a.height / 2) - this.height / 2;
+		this.y = a.height / 2 - this.height / 2;
 		this.fill = 'red';
+		this.blur = 50;
 	},
 
 	render: function () {
@@ -61,13 +62,67 @@ var fire = {
 		c.lineTo(this.x + this.width, this.y + this.height);
 		c.lineTo(this.x, this.y + this.height);
 		c.fillStyle = this.fill;
+		c.shadowColor = this.fill;
+		c.shadowBlur = this.blur;
 		c.fill();
 		c.closePath();
 	}
 }
 
+var wind = {
+	lastGenerationTime: 0,
+
+	generationFrequencyMs: 700,
+
+	generate: function () {
+		this.width = 200;
+		this.isFromLeft = this.getDirection();
+		this.x = this.isFromLeft ? 0 - this.width : a.width;
+		this.y = a.height / 2;
+		this.speed = 5;
+		this.stroke = 'white';
+		this.blur = 100;
+	},
+
+	getDirection: function () {
+		return true;
+	},
+
+	render: function () {
+		c.beginPath();
+		c.moveTo(this.x, this.y);
+		c.lineTo(this.x + this.width, this.y);
+		c.strokeStyle = this.stroke;
+		c.shadowColor = this.stroke;
+		c.shadowBlur = this.blur;
+		c.stroke();
+		c.closePath();
+	}
+};
+
+var generator = {
+	events: [],
+
+	register: function(event) {
+		events.push(event);
+	},
+
+	next: function () {
+		for (var event of events) {
+			var shouldGenerate = Date.now() - event.lastGenerationTime >= event.generationFrequencyMs
+			
+			if (shouldGenerate) {
+				event.generate();
+				event.lastGenerationTime = Date.now();
+			}
+		}
+	}
+};
+
 shield.init();
 fire.init();
+
+generator.register(wind);
 
 loop();
 
@@ -78,6 +133,9 @@ function loop() {
 
 	shield.render();
 	fire.render();
+	wind.render();
+
+	generator.next();
 
 	requestAnimationFrame(loop);
 }

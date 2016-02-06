@@ -1,10 +1,9 @@
 #!/usr/bin/env bash
 
 out_dir=dist
-header_end_line=125
-footer_start_line=126
-html_length=155
-browser_bin=chromium-browser
+header_end_line=124
+footer_start_line=125
+html_length=154
 html_file=index.html
 script=index.js
 source_map=index.map.js
@@ -26,6 +25,4 @@ cat $out_dir/index.min.js >> $out_dir/$html_file
 
 footer_lines=$(expr $html_length - $footer_start_line)
 tail --lines $footer_lines $html_file >> $out_dir/$html_file
-
-echo "Done! Opening with $browser_bin..."
-$browser_bin $out_dir/$html_file
+echo "Done!"

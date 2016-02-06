@@ -7,4 +7,4 @@ My JS1K entry
 
 ### `./tasks/build.sh`
 
-Runs UglifyJS against the index.js script and injects it into the index.html file that's copied to the dist directory. Once built, it will be opened by the configured browser (defaulting to `chromium-browser`.)
+Runs UglifyJS against the index.js script and injects it into the index.html file that's copied to the configured output directory.

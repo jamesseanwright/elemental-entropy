@@ -104,11 +104,12 @@ var generator = {
 	events: [],
 
 	register: function(event) {
-		events.push(event);
+		this.events.push(event);
 	},
 
 	next: function () {
-		for (var event of events) {
+		for (var i in this.events) {
+			var event = this.events[i];
 			var shouldGenerate = Date.now() - event.lastGenerationTime >= event.generationFrequencyMs
 			
 			if (shouldGenerate) {

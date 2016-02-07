@@ -70,11 +70,9 @@ var fire = {
 }
 
 var wind = {
-	lastGenerationTime: 0,
-
 	generationFrequencyMs: 700,
 
-	generate: function () {
+	init: function () {
 		this.width = 200;
 		this.isFromLeft = this.getDirection();
 		this.x = this.isFromLeft ? 0 - this.width : a.width;
@@ -82,6 +80,8 @@ var wind = {
 		this.speed = 5;
 		this.stroke = 'white';
 		this.blur = 100;
+
+		mover.register(this);
 	},
 
 	getDirection: function () {
@@ -97,6 +97,30 @@ var wind = {
 		c.shadowBlur = this.blur;
 		c.stroke();
 		c.closePath();
+	},
+
+	destroy: function () {
+		mover.unregister(this);
+	}
+};
+
+var mover = {
+	movees: [],
+
+	register: function (movee) {
+		this.movees.push(movee);
+	},
+
+	unregister: function (movee) {
+		this.movees = this.movees.filter(function (m) { return movee !== m });
+	},
+
+	next: function () {
+		for (var i in this.movees) {
+			var movee = this.movees[i];
+
+			movee.x = movee.isFromLeft ? movee.x + movee.speed : movee.x - movee.speed;
+		}
 	}
 };
 
@@ -104,16 +128,18 @@ var generator = {
 	events: [],
 
 	register: function(event) {
+		event.lastGenerationTime = Date.now();
 		this.events.push(event);
 	},
 
 	next: function () {
 		for (var i in this.events) {
 			var event = this.events[i];
-			var shouldGenerate = Date.now() - event.lastGenerationTime >= event.generationFrequencyMs
+
+			var shouldGenerate = Date.now() - event.lastGenerationTime >= event.generationFrequencyMs;
 			
 			if (shouldGenerate) {
-				event.generate();
+				event.init();
 				event.lastGenerationTime = Date.now();
 			}
 		}
@@ -137,6 +163,7 @@ function loop() {
 	wind.render();
 
 	generator.next();
+	mover.next();
 
 	requestAnimationFrame(loop);
 }

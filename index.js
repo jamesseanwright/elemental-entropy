@@ -70,13 +70,16 @@ var fire = {
 }
 
 var wind = {
-	generationFrequencyMs: 700,
+	generationFrequencyMs: 1000,
+	isActive: false,
 
 	init: function () {
+		this.numLines = 3;
+		this.lineSpacing = 5;
 		this.width = 200;
 		this.isFromLeft = this.getDirection();
 		this.x = this.isFromLeft ? 0 - this.width : a.width;
-		this.y = a.height / 2;
+		this.y = a.height / 2 - (this.lineSpacing * this.numLines);
 		this.speed = 5;
 		this.stroke = 'white';
 		this.blur = 100;
@@ -89,14 +92,20 @@ var wind = {
 	},
 
 	render: function () {
-		c.beginPath();
-		c.moveTo(this.x, this.y);
-		c.lineTo(this.x + this.width, this.y);
 		c.strokeStyle = this.stroke;
 		c.shadowColor = this.stroke;
 		c.shadowBlur = this.blur;
-		c.stroke();
-		c.closePath();
+
+		for (var i = 0; i < this.numLines; i++) {
+			var vertOffset = i * this.lineSpacing
+
+			c.beginPath();
+			c.moveTo(this.x, this.y + vertOffset);
+			c.lineTo(this.x + this.width, this.y + vertOffset);
+			
+			c.stroke();
+			c.closePath();
+		}
 	},
 
 	destroy: function () {
@@ -136,9 +145,10 @@ var generator = {
 		for (var i in this.events) {
 			var event = this.events[i];
 
-			var shouldGenerate = Date.now() - event.lastGenerationTime >= event.generationFrequencyMs;
+			var freqSurpassed = Date.now() - event.lastGenerationTime >= event.generationFrequencyMs;
 			
-			if (shouldGenerate) {
+			if (freqSurpassed && !event.isActive) {
+				event.isActive = true;
 				event.init();
 				event.lastGenerationTime = Date.now();
 			}

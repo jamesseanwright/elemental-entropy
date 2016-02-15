@@ -69,47 +69,52 @@ var fire = {
 	}
 }
 
-var wind = {
-	generationFrequencyMs: 1000,
-	isActive: false,
+function Wind() {
+	this.numLines = 3;
+	this.lineSpacing = 5;
+	this.width = 200;
+	this.isFromLeft = Wind.getDirection();
+	this.x = this.isFromLeft ? 0 - this.width : a.width;
+	this.y = a.height / 2 - (this.lineSpacing * this.numLines);
+	this.speed = 5;
+	this.stroke = 'white';
+	this.blur = 100;
+	
+	mover.register(this);
+}
 
-	init: function () {
-		this.numLines = 3;
-		this.lineSpacing = 5;
-		this.width = 200;
-		this.isFromLeft = this.getDirection();
-		this.x = this.isFromLeft ? 0 - this.width : a.width;
-		this.y = a.height / 2 - (this.lineSpacing * this.numLines);
-		this.speed = 5;
-		this.stroke = 'white';
-		this.blur = 100;
+Wind.generationFrequencyMs = 1000;
+Wind.instances = [];
 
-		mover.register(this);
-	},
+Wind.getDirection = function () {
+	return true;
+};
 
-	getDirection: function () {
-		return true;
-	},
+Wind.create = function () {
+	Wind.instances.push(new Wind());
+};
 
-	render: function () {
-		c.strokeStyle = this.stroke;
-		c.shadowColor = this.stroke;
-		c.shadowBlur = this.blur;
+Wind.render = function () {
+	for (var i in Wind.instances) {
+		var instance = Wind.instances[i];
+		instance.render();
+	}
+}
 
-		for (var i = 0; i < this.numLines; i++) {
-			var vertOffset = i * this.lineSpacing
+Wind.prototype.render = function () {
+	c.strokeStyle = this.stroke;
+	c.shadowColor = this.stroke;
+	c.shadowBlur = this.blur;
 
-			c.beginPath();
-			c.moveTo(this.x, this.y + vertOffset);
-			c.lineTo(this.x + this.width, this.y + vertOffset);
-			
-			c.stroke();
-			c.closePath();
-		}
-	},
+	for (var i = 0; i < this.numLines; i++) {
+		var vertOffset = i * this.lineSpacing
 
-	destroy: function () {
-		mover.unregister(this);
+		c.beginPath();
+		c.moveTo(this.x, this.y + vertOffset);
+		c.lineTo(this.x + this.width, this.y + vertOffset);
+		
+		c.stroke();
+		c.closePath();
 	}
 };
 
@@ -152,21 +157,20 @@ var collider = {
 var generator = {
 	events: [],
 
-	register: function(event) {
-		event.lastGenerationTime = Date.now();
-		this.events.push(event);
+	register: function(Event) {
+		Event.lastGenerationTime = Date.now();
+		this.events.push(Event);
 	},
 
 	next: function () {
 		for (var i in this.events) {
-			var event = this.events[i];
+			var Event = this.events[i];
 
-			var freqSurpassed = Date.now() - event.lastGenerationTime >= event.generationFrequencyMs;
+			var freqSurpassed = Date.now() - Event.lastGenerationTime >= Event.generationFrequencyMs;
 			
-			if (freqSurpassed && !event.isActive) {
-				event.isActive = true;
-				event.init();
-				event.lastGenerationTime = Date.now();
+			if (freqSurpassed) {
+				Event.create();
+				Event.lastGenerationTime = Date.now();
 			}
 		}
 	}
@@ -175,7 +179,7 @@ var generator = {
 shield.init();
 fire.init();
 
-generator.register(wind);
+generator.register(Wind);
 collider.setTarget(fire);
 
 loop();
@@ -187,7 +191,7 @@ function loop() {
 
 	shield.render();
 	fire.render();
-	wind.render();
+	Wind.render();
 
 	generator.next();
 	mover.next();

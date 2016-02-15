@@ -70,24 +70,24 @@ var fire = {
 }
 
 function Wind() {
-	this.numLines = 3;
-	this.lineSpacing = 5;
-	this.width = 200;
 	this.isFromLeft = Wind.getDirection();
-	this.x = this.isFromLeft ? 0 - this.width : a.width;
-	this.y = a.height / 2 - (this.lineSpacing * this.numLines);
+	this.x = this.isFromLeft ? 0 - Wind.width : a.width;
 	this.speed = 5;
-	this.stroke = 'white';
-	this.blur = 100;
 	
 	mover.register(this);
 }
 
 Wind.generationFrequencyMs = 1000;
 Wind.instances = [];
+Wind.numLines = 3;
+Wind.lineSpacing = 5;
+Wind.width = 200;
+Wind.y = a.height / 2 - (Wind.lineSpacing * Wind.numLines);
+Wind.stroke = 'white';
+Wind.blur = 100;
 
 Wind.getDirection = function () {
-	return true;
+	return Math.round(Math.random()) === 0;
 };
 
 Wind.create = function () {
@@ -99,19 +99,19 @@ Wind.render = function () {
 		var instance = Wind.instances[i];
 		instance.render();
 	}
-}
+};
 
 Wind.prototype.render = function () {
-	c.strokeStyle = this.stroke;
-	c.shadowColor = this.stroke;
-	c.shadowBlur = this.blur;
+	c.strokeStyle = Wind.stroke;
+	c.shadowColor = Wind.stroke;
+	c.shadowBlur = Wind.blur;
 
-	for (var i = 0; i < this.numLines; i++) {
-		var vertOffset = i * this.lineSpacing
+	for (var i = 0; i < Wind.numLines; i++) {
+		var vertOffset = i * Wind.lineSpacing
 
 		c.beginPath();
-		c.moveTo(this.x, this.y + vertOffset);
-		c.lineTo(this.x + this.width, this.y + vertOffset);
+		c.moveTo(this.x, Wind.y + vertOffset);
+		c.lineTo(this.x + Wind.width, Wind.y + vertOffset);
 		
 		c.stroke();
 		c.closePath();

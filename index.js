@@ -77,7 +77,7 @@ function Wind() {
 	mover.register(this);
 }
 
-Wind.generationFrequencyMs = 1000;
+Wind.generationFrequencyMs = 1500;
 Wind.instances = [];
 Wind.numLines = 3;
 Wind.lineSpacing = 5;

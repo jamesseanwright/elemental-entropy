@@ -129,9 +129,25 @@ var mover = {
 			var movee = this.movees[i];
 
 			movee.x = movee.isFromLeft ? movee.x + movee.speed : movee.x - movee.speed;
+			collider.detect(movee);
 		}
 	}
 };
+
+var collider = {
+	setTarget: function (target) {
+		this.target = target;
+	},
+
+	detect: function (movee) {
+		var target = this.target;
+		var isHit = movee.isFromLeft 
+					? movee.x + movee.width >= target.x
+					: movee.x <= target.x + target.width;
+
+		if (isHit) alert('Game over!');
+	}
+}
 
 var generator = {
 	events: [],
@@ -160,6 +176,7 @@ shield.init();
 fire.init();
 
 generator.register(wind);
+collider.setTarget(fire);
 
 loop();
 

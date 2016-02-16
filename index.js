@@ -91,6 +91,7 @@ Wind.stroke = 'white';
 Wind.blur = 100;
 
 Wind.getDirection = function () {
+	// TODO: alternate depending upon previous direction, change frequency too
 	return Math.round(Math.random()) === 0;
 };
 

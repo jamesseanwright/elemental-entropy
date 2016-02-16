@@ -53,9 +53,12 @@ var fire = {
 		this.y = a.height / 2 - this.height / 2;
 		this.fill = 'red';
 		this.blur = 50;
+		this.isActive = true;
 	},
 
 	render: function () {
+		if (!this.isActive) return;
+
 		c.beginPath();
 		c.moveTo(this.x, this.y + this.height);
 		c.lineTo(this.x + this.width / 2, this.y);
@@ -70,6 +73,7 @@ var fire = {
 }
 
 function Wind() {
+	this.width = Wind.width;
 	this.isFromLeft = Wind.getDirection();
 	this.x = this.isFromLeft ? 0 - Wind.width : a.width;
 	this.speed = 5;
@@ -81,7 +85,7 @@ Wind.generationFrequencyMs = 1500;
 Wind.instances = [];
 Wind.numLines = 3;
 Wind.lineSpacing = 5;
-Wind.width = 200;
+Wind.width = 50;
 Wind.y = a.height / 2 - (Wind.lineSpacing * Wind.numLines);
 Wind.stroke = 'white';
 Wind.blur = 100;
@@ -146,11 +150,11 @@ var collider = {
 
 	detect: function (movee) {
 		var target = this.target;
-		var isHit = movee.isFromLeft 
+		var isHit = movee.isFromLeft
 					? movee.x + movee.width >= target.x
 					: movee.x <= target.x + target.width;
 
-		if (isHit) alert('Game over!');
+		if (isHit) target.isActive = false;
 	}
 }
 

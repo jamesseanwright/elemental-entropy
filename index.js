@@ -51,9 +51,10 @@ var shield = {
 function Particle(options) {
 	options = options || {};
 	this.isPlayer = options.isPlayer;
-	this.radius = options.radius || Particle.getRadius();
-	this.x = options.x || 400 - this.radius;
-	this.y = options.y || 0 - this.radius;
+	this.radius = options.radius || Particle.generateRadius();
+	this.x = options.x || 0 - Particle.generatePos(a.width);
+	this.y = options.y || 0 - Particle.generatePos(a.height);
+	console.log(this.x, this.y);
 	this.setSpeed();
 
 	if (this.isPlayer) collider.setTarget(this);
@@ -65,8 +66,12 @@ Particle.instances = [];
 Particle.fill = 'blue';
 Particle.blur = 100;
 
-Particle.getRadius = function () {
+Particle.generateRadius = function () {
 	return 20;
+};
+
+Particle.generatePos = function (length) {
+	return Math.random() * length;
 };
 
 Particle.create = function (options) {
@@ -117,13 +122,8 @@ Particle.prototype.setSpeed = function () {
 
 	var speed = 8;
 
-	console.log(distanceFromX, distanceFromY);
-
-	this.xSpeed = Math.abs(speed * (distanceFromY / PLAYER_Y))
-	this.ySpeed = Math.abs(speed * (distanceFromX / PLAYER_X));
-
-	console.log(this.xSpeed);
-	console.log(this.ySpeed);
+	this.xSpeed = speed * (distanceFromY / PLAYER_Y)
+	this.ySpeed = speed * (distanceFromX / PLAYER_X);
 };
 
 Particle.prototype.move = function () {

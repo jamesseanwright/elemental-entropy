@@ -10,7 +10,7 @@
 var PI = Math.PI;
 var PLAYER_X = a.width / 2;
 var PLAYER_Y = a.height / 2;
-var PLAYER_RADIUS = 75;
+var PLAYER_RADIUS = 45;
 
 var isGameRunning = true;
 
@@ -18,7 +18,7 @@ var shield = {
 	init: function () {
 		this.rotation = 0;
 		this.radianModifier = 1;
-		this.radius = PLAYER_RADIUS + 10;
+		this.radius = PLAYER_RADIUS + 30;
 		this.stroke = 'white';
 
 		a.addEventListener('mousemove', function (e) { 
@@ -28,7 +28,7 @@ var shield = {
 	
 	rotate: function (e) {
 		var centre = a.width / 2;
-		this.rotation = (PI - ((e.clientX - centre) / PI)) / 100;
+		this.rotation = (PI - (e.clientX - centre)) / 100;
 	},
 
 	render: function () {
@@ -50,10 +50,13 @@ var shield = {
 
 function Particle(options) {
 	options = options || {};
+	this.isPlayer = options.isPlayer;
 	this.radius = options.radius || Particle.getRadius();
 	this.x = options.x || 0;
 	this.y = options.y || 0;
 	this.speed = 5;
+
+	if (this.isPlayer) collider.setTarget(this);
 }
 
 Particle.generationFrequencyMs = 1500;
@@ -71,10 +74,10 @@ Particle.create = function (options) {
 
 Particle.next = function () {
 	for (var i in Particle.instances) {
-		var instance = Particle.instances[i];
-		instance.render();
+		var particle = Particle.instances[i];
+		particle.render();
 
-		if (particle.isMovable) particle(particle)
+		if (particle.isMovable) move(particle)
 		
 		collider.detect(particle);
 	}
@@ -95,11 +98,13 @@ function move(particle) {
 }
 
 var collider = {
-	setTarget: function (target) {
-		this.target = target;
+	setTarget: function (particle) {
+		this.target = particle;
 	},
 
 	detect: function (particle) {
+		if (particle.isPlayer) return;
+
 		var target = this.target;
 		var isHit = particle.isFromLeft
 					? particle.x + particle.width >= target.x
@@ -136,14 +141,13 @@ var generator = {
 
 shield.init();
 
-var player = new Particle({
+Particle.create({
+	isPlayer: true,
 	radius: PLAYER_RADIUS,
 	x: PLAYER_X,
 	y: PLAYER_Y,
 	onHit: gameOver
 });
-
-collider.setTarget(player);
 
 loop();
 

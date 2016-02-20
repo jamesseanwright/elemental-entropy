@@ -8,14 +8,16 @@
  * - g - a's 3D context */
 
 var PI = Math.PI;
+var PLAYER_X = a.width / 2;
+var PLAYER_Y = a.height / 2;
+var PLAYER_RADIUS = 75;
+var IS_GAME_RUNNING = true;
 
 var shield = {
 	init: function () {
 		this.rotation = 0;
-		this.x = a.width / 2;
-		this.y = a.height / 2;
 		this.radianModifier = 1;
-		this.radius = 85;
+		this.radius = PLAYER_RADIUS + 10;
 		this.stroke = 'white';
 
 		a.addEventListener('mousemove', function (e) { 
@@ -33,7 +35,7 @@ var shield = {
 
 		c.strokeStyle = this.stroke;
 		c.beginPath();
-		c.arc(this.x, this.y, this.radius, rotation.start, rotation.end);
+		c.arc(PLAYER_X, PLAYER_Y, this.radius, rotation.start, rotation.end);
 		c.stroke();
 	},
 
@@ -45,117 +47,62 @@ var shield = {
 	}
 };
 
-var fire = {
-	init: function () {
-		this.width = 90;
-		this.height = 80;
-		this.x = a.width / 2 - this.width / 2;
-		this.y = a.height / 2 - this.height / 2;
-		this.fill = 'red';
-		this.blur = 50;
-		this.isActive = true;
-	},
-
-	render: function () {
-		if (!this.isActive) return;
-
-		c.beginPath();
-		c.moveTo(this.x, this.y + this.height);
-		c.lineTo(this.x + this.width / 2, this.y);
-		c.lineTo(this.x + this.width, this.y + this.height);
-		c.lineTo(this.x, this.y + this.height);
-		c.fillStyle = this.fill;
-		c.shadowColor = this.fill;
-		c.shadowBlur = this.blur;
-		c.fill();
-		c.closePath();
-	}
-}
-
-function Wind() {
-	this.width = Wind.width;
-	this.isFromLeft = Wind.getDirection();
+function Particle(options) {
+	options = options || {};
+	this.size = options.size || Particle.getSize();
 	this.x = this.isFromLeft ? 0 - Wind.width : a.width;
 	this.speed = 5;
-	
-	mover.register(this);
 }
 
-Wind.generationFrequencyMs = 1500;
-Wind.instances = [];
-Wind.numLines = 3;
-Wind.lineSpacing = 5;
-Wind.width = 50;
-Wind.y = a.height / 2 - (Wind.lineSpacing * Wind.numLines);
-Wind.stroke = 'white';
-Wind.blur = 100;
+Particle.generationFrequencyMs = 1500;
+Particle.instances = [];
+Particle.fill = 'blue';
+Particle.blur = 100;
 
-Wind.getDirection = function () {
-	// TODO: alternate depending upon previous direction, change frequency too
-	return Math.round(Math.random()) === 0;
+Particle.create = function (options) {
+	Particle.instances.push(new Particle(options));
 };
 
-Wind.create = function () {
-	Wind.instances.push(new Wind());
-};
-
-Wind.render = function () {
-	for (var i in Wind.instances) {
-		var instance = Wind.instances[i];
+Particle.next = function () {
+	for (var i in Particle.instances) {
+		var instance = Particle.instances[i];
 		instance.render();
-	}
-};
 
-Wind.prototype.render = function () {
-	c.strokeStyle = Wind.stroke;
-	c.shadowColor = Wind.stroke;
-	c.shadowBlur = Wind.blur;
-
-	for (var i = 0; i < Wind.numLines; i++) {
-		var vertOffset = i * Wind.lineSpacing
-
-		c.beginPath();
-		c.moveTo(this.x, Wind.y + vertOffset);
-		c.lineTo(this.x + Wind.width, Wind.y + vertOffset);
+		if (particle.isMovable) particle(particle)
 		
-		c.stroke();
-		c.closePath();
+		collider.detect(particle);
 	}
 };
 
-var mover = {
-	movees: [],
-
-	register: function (movee) {
-		this.movees.push(movee);
-	},
-
-	unregister: function (movee) {
-		this.movees = this.movees.filter(function (m) { return movee !== m });
-	},
-
-	next: function () {
-		for (var i in this.movees) {
-			var movee = this.movees[i];
-
-			movee.x = movee.isFromLeft ? movee.x + movee.speed : movee.x - movee.speed;
-			collider.detect(movee);
-		}
-	}
+Particle.prototype.render = function () {
+	c.fillStyle = Particle.fill;
+	c.shadowColor = Particle.fill;
+	c.shadowBlur = Particle.blur;
+	c.beginPath();
+	c.arc(this.x, this.y, this.size, 0, PI * 2);
+	c.fill();
+	c.closePath();
 };
+
+function move(particle) {
+	particle.x = particle.isFromLeft ? particle.x + particle.speed : particle.x - particle.speed;
+}
 
 var collider = {
 	setTarget: function (target) {
 		this.target = target;
 	},
 
-	detect: function (movee) {
+	detect: function (particle) {
 		var target = this.target;
-		var isHit = movee.isFromLeft
-					? movee.x + movee.width >= target.x
-					: movee.x <= target.x + target.width;
+		var isHit = particle.isFromLeft
+					? particle.x + particle.width >= target.x
+					: particle.x <= target.x + target.width;
 
-		if (isHit) target.isActive = false;
+		if (isHit) {
+			target.isActive = false;
+			target.onHit && target.onHit();
+		}
 	}
 }
 
@@ -182,9 +129,6 @@ var generator = {
 };
 
 shield.init();
-fire.init();
-
-generator.register(Wind);
 collider.setTarget(fire);
 
 loop();

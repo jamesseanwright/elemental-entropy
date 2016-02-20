@@ -115,28 +115,6 @@ var collider = {
 			target.onHit && target.onHit();
 		}
 	}
-}
-
-var generator = {
-	events: [],
-
-	register: function(Event) {
-		Event.lastGenerationTime = Date.now();
-		this.events.push(Event);
-	},
-
-	next: function () {
-		for (var i in this.events) {
-			var Event = this.events[i];
-
-			var freqSurpassed = Date.now() - Event.lastGenerationTime >= Event.generationFrequencyMs;
-			
-			if (freqSurpassed) {
-				Event.create();
-				Event.lastGenerationTime = Date.now();
-			}
-		}
-	}
 };
 
 shield.init();

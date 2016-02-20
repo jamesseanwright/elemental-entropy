@@ -11,7 +11,8 @@ var PI = Math.PI;
 var PLAYER_X = a.width / 2;
 var PLAYER_Y = a.height / 2;
 var PLAYER_RADIUS = 75;
-var IS_GAME_RUNNING = true;
+
+var isGameRunning = true;
 
 var shield = {
 	init: function () {
@@ -49,8 +50,9 @@ var shield = {
 
 function Particle(options) {
 	options = options || {};
-	this.size = options.size || Particle.getSize();
-	this.x = this.isFromLeft ? 0 - Wind.width : a.width;
+	this.radius = options.radius || Particle.getRadius();
+	this.x = options.x || 0;
+	this.y = options.y || 0;
 	this.speed = 5;
 }
 
@@ -58,6 +60,10 @@ Particle.generationFrequencyMs = 1500;
 Particle.instances = [];
 Particle.fill = 'blue';
 Particle.blur = 100;
+
+Particle.getRadius = function () {
+	return 50;
+};
 
 Particle.create = function (options) {
 	Particle.instances.push(new Particle(options));
@@ -79,7 +85,7 @@ Particle.prototype.render = function () {
 	c.shadowColor = Particle.fill;
 	c.shadowBlur = Particle.blur;
 	c.beginPath();
-	c.arc(this.x, this.y, this.size, 0, PI * 2);
+	c.arc(this.x, this.y, this.radius, 0, PI * 2);
 	c.fill();
 	c.closePath();
 };
@@ -129,21 +135,31 @@ var generator = {
 };
 
 shield.init();
-collider.setTarget(fire);
+
+var player = new Particle({
+	radius: PLAYER_RADIUS,
+	x: PLAYER_X,
+	y: PLAYER_Y,
+	onHit: gameOver
+});
+
+collider.setTarget(player);
 
 loop();
 
+function gameOver() {
+	isGameRunning = false;
+}
+
 function loop() {
+	if (!isGameRunning) return;
+
 	c.clearRect(0, 0, a.width, a.height);
 	c.fillStyle = 'black';
 	c.fillRect(0, 0, a.width, a.height);
 
 	shield.render();
-	fire.render();
-	Wind.render();
-
-	generator.next();
-	mover.next();
+	Particle.next();
 
 	requestAnimationFrame(loop);
 }

@@ -52,20 +52,21 @@ function Particle(options) {
 	options = options || {};
 	this.isPlayer = options.isPlayer;
 	this.radius = options.radius || Particle.getRadius();
-	this.x = options.x || 0;
-	this.y = options.y || 0;
-	this.speed = 5;
+	this.x = options.x || 400 - this.radius;
+	this.y = options.y || 0 - this.radius;
+	this.setSpeed();
 
 	if (this.isPlayer) collider.setTarget(this);
 }
 
 Particle.generationFrequencyMs = 1500;
+Particle.lastGeneration = Date.now() - Particle.generationFrequencyMs;
 Particle.instances = [];
 Particle.fill = 'blue';
 Particle.blur = 100;
 
 Particle.getRadius = function () {
-	return 50;
+	return 20;
 };
 
 Particle.create = function (options) {
@@ -73,15 +74,27 @@ Particle.create = function (options) {
 };
 
 Particle.next = function () {
+	Particle.tryGenerate();
+
 	for (var i in Particle.instances) {
 		var particle = Particle.instances[i];
 		particle.render();
 
-		if (particle.isMovable) move(particle)
+		if (!particle.isPlayer) particle.move();
 		
 		collider.detect(particle);
 	}
 };
+
+Particle.tryGenerate = function () {
+	var now = Date.now();
+	var shouldGenerate = now - Particle.lastGeneration >= Particle.generationFrequencyMs;
+
+	if (shouldGenerate) {
+		Particle.create();
+		Particle.lastGeneration = now;
+	}
+}
 
 Particle.prototype.render = function () {
 	c.fillStyle = Particle.fill;
@@ -93,9 +106,30 @@ Particle.prototype.render = function () {
 	c.closePath();
 };
 
-function move(particle) {
-	particle.x = particle.isFromLeft ? particle.x + particle.speed : particle.x - particle.speed;
-}
+Particle.prototype.setSpeed = function () {
+	var distanceFromX = this.x > PLAYER_X
+		? PLAYER_X - (this.x - PLAYER_X)
+		: this.x;
+
+	var distanceFromY = this.y > PLAYER_Y
+		? PLAYER_Y - (this.y - PLAYER_Y)
+		: this.y;
+
+	var speed = 8;
+
+	console.log(distanceFromX, distanceFromY);
+
+	this.xSpeed = Math.abs(speed * (distanceFromY / PLAYER_Y))
+	this.ySpeed = Math.abs(speed * (distanceFromX / PLAYER_X));
+
+	console.log(this.xSpeed);
+	console.log(this.ySpeed);
+};
+
+Particle.prototype.move = function () {
+	this.x += this.xSpeed;
+	this.y += this.ySpeed;
+};
 
 var collider = {
 	setTarget: function (particle) {
@@ -110,10 +144,7 @@ var collider = {
 					? particle.x + particle.width >= target.x
 					: particle.x <= target.x + target.width;
 
-		if (isHit) {
-			target.isActive = false;
-			target.onHit && target.onHit();
-		}
+		if (isHit && target.onHit) target.onHit();
 	}
 };
 
@@ -133,6 +164,8 @@ function gameOver() {
 	isGameRunning = false;
 }
 
+var tick = Date.now();
+
 function loop() {
 	if (!isGameRunning) return;
 
@@ -142,6 +175,8 @@ function loop() {
 
 	shield.render();
 	Particle.next();
+
+	tick = Date.now();
 
 	requestAnimationFrame(loop);
 }

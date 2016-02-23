@@ -54,19 +54,34 @@ function Particle(options) {
 	this.radius = options.radius || Particle.generateRadius();
 	this.x = options.x || 800 //- Particle.generatePos(a.width);
 	this.y = options.y || 0 //- Particle.generatePos(a.height);
+	this.fill = Particle.generateFill(this.isPlayer);
+
 	this.setSpeed();
 
 	if (this.isPlayer) collider.setTarget(this);
 }
 
+Particle.baseRadius = 30;
 Particle.generationFrequencyMs = 1500;
 Particle.lastGeneration = Date.now() - Particle.generationFrequencyMs;
-Particle.instances = [];
-Particle.fill = 'blue';
+Particle.instances = []; // TODO: collect instances that have left screen
 Particle.blur = 100;
 
+Particle.fills = {
+	player: 'blue',
+	other: ['orange', '#008080']
+};
+
 Particle.generateRadius = function () {
-	return 20;
+	return Particle.baseRadius - (Math.ceil(Math.random() * Particle.baseRadius) / 2);
+};
+
+Particle.generateFill = function (isPlayer) {
+	var other = Particle.fills.other;
+
+	return isPlayer 
+		? Particle.fills.player
+		: other[Math.floor(Math.random() * other.length)];
 };
 
 Particle.generatePos = function (length) {
@@ -101,8 +116,8 @@ Particle.tryGenerate = function () {
 }
 
 Particle.prototype.render = function () {
-	c.fillStyle = Particle.fill;
-	c.shadowColor = Particle.fill;
+	c.fillStyle = this.fill;
+	c.shadowColor = this.fill;
 	c.shadowBlur = Particle.blur;
 	c.beginPath();
 	c.arc(this.x, this.y, this.radius, 0, PI * 2);
@@ -115,8 +130,6 @@ Particle.prototype.setSpeed = function () {
 	var distanceFromY = PLAYER_Y - this.y;
 	var aspectRatio =  a.height / a.width;
 	var speed = 8;
-
-	console.log(distanceFromX / PLAYER_X, distanceFromY / PLAYER_Y)
 
 	this.xSpeed = speed * (distanceFromX / PLAYER_X);
 	this.ySpeed = (speed * (distanceFromY / PLAYER_Y)) * aspectRatio;

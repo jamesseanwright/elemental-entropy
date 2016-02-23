@@ -52,7 +52,7 @@ function Particle(options) {
 	options = options || {};
 	this.isPlayer = options.isPlayer;
 	this.radius = options.radius || Particle.generateRadius();
-	this.x = options.x || 400 //- Particle.generatePos(a.width);
+	this.x = options.x || 800 //- Particle.generatePos(a.width);
 	this.y = options.y || 0 //- Particle.generatePos(a.height);
 	this.setSpeed();
 
@@ -113,10 +113,13 @@ Particle.prototype.render = function () {
 Particle.prototype.setSpeed = function () {
 	var distanceFromX = PLAYER_X - this.x;
 	var distanceFromY = PLAYER_Y - this.y;
+	var aspectRatio =  a.height / a.width;
 	var speed = 8;
 
-	this.xSpeed = speed * (distanceFromX / PLAYER_X)
-	this.ySpeed = speed * (distanceFromY / PLAYER_Y);
+	console.log(distanceFromX / PLAYER_X, distanceFromY / PLAYER_Y)
+
+	this.xSpeed = speed * (distanceFromX / PLAYER_X);
+	this.ySpeed = (speed * (distanceFromY / PLAYER_Y)) * aspectRatio;
 };
 
 Particle.prototype.move = function () {

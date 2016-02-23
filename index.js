@@ -52,9 +52,8 @@ function Particle(options) {
 	options = options || {};
 	this.isPlayer = options.isPlayer;
 	this.radius = options.radius || Particle.generateRadius();
-	this.x = options.x || 0 - Particle.generatePos(a.width);
-	this.y = options.y || 0 - Particle.generatePos(a.height);
-	console.log(this.x, this.y);
+	this.x = options.x || 500 //- Particle.generatePos(a.width);
+	this.y = options.y || 0 //- Particle.generatePos(a.height);
 	this.setSpeed();
 
 	if (this.isPlayer) collider.setTarget(this);
@@ -114,16 +113,16 @@ Particle.prototype.render = function () {
 Particle.prototype.setSpeed = function () {
 	var distanceFromX = this.x > PLAYER_X
 		? PLAYER_X - (this.x - PLAYER_X)
-		: this.x;
+		: PLAYER_X - this.x;
 
 	var distanceFromY = this.y > PLAYER_Y
 		? PLAYER_Y - (this.y - PLAYER_Y)
-		: this.y;
+		: PLAYER_Y - this.y;
 
 	var speed = 8;
 
-	this.xSpeed = speed * (distanceFromY / PLAYER_Y)
-	this.ySpeed = speed * (distanceFromX / PLAYER_X);
+	this.xSpeed = speed * (distanceFromX / PLAYER_X)
+	this.ySpeed = speed * (distanceFromY / PLAYER_Y);
 };
 
 Particle.prototype.move = function () {

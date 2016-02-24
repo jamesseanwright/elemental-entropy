@@ -92,16 +92,26 @@ Particle.create = function (options) {
 };
 
 Particle.next = function () {
+	Particle.cleanup();
 	Particle.tryGenerate();
 
 	for (var i in Particle.instances) {
 		var particle = Particle.instances[i];
 		particle.render();
 
-		if (!particle.isPlayer) particle.move();
-		
+		if (!particle.isPlayer) {
+			particle.move();
+			particle.cleanup = particle.detectCleanup();
+		}
+
 		collider.detect(particle);
 	}
+};
+
+Particle.cleanup = function () {
+	Particle.instances = Particle.instances.filter(function (p) { 
+		return !p.cleanup;
+	});
 };
 
 Particle.tryGenerate = function () {
@@ -164,6 +174,16 @@ Particle.prototype.getStartPos = function (length) {
 Particle.prototype.move = function () {
 	this.x += this.xSpeed;
 	this.y += this.ySpeed;
+};
+
+Particle.prototype.detectCleanup = function () {
+	var boundBuffer = 1;
+	var isOutOfBounds = this.x > a.width + this.radius + boundBuffer
+						|| this.x < 0 - (this.radius + boundBuffer)
+						|| this.y > a.height + this.radius + boundBuffer
+						|| this.y < 0 - (this.radius + boundBuffer);
+
+	return isOutOfBounds;
 };
 
 var collider = {

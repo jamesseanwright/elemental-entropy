@@ -52,17 +52,16 @@ function Particle(options) {
 	options = options || {};
 	this.isPlayer = options.isPlayer;
 	this.radius = options.radius || Particle.generateRadius();
-	this.x = options.x || 800 //- Particle.generatePos(a.width);
-	this.y = options.y || 0 //- Particle.generatePos(a.height);
 	this.fill = Particle.generateFill(this.isPlayer);
 
+	this.setPos(options);
 	this.setSpeed();
 
 	if (this.isPlayer) collider.setTarget(this);
 }
 
 Particle.baseRadius = 30;
-Particle.generationFrequencyMs = 1500;
+Particle.generationFrequencyMs = 1200;
 Particle.lastGeneration = Date.now() - Particle.generationFrequencyMs;
 Particle.instances = []; // TODO: collect instances that have left screen
 Particle.blur = 100;
@@ -113,7 +112,7 @@ Particle.tryGenerate = function () {
 		Particle.create();
 		Particle.lastGeneration = now;
 	}
-}
+};
 
 Particle.prototype.render = function () {
 	c.fillStyle = this.fill;
@@ -133,6 +132,33 @@ Particle.prototype.setSpeed = function () {
 
 	this.xSpeed = speed * (distanceFromX / PLAYER_X);
 	this.ySpeed = (speed * (distanceFromY / PLAYER_Y)) * aspectRatio;
+};
+
+Particle.prototype.setPos = function (options) {
+	var isX;
+	var hasCustomPos = options.x && options.y;
+
+	if (hasCustomPos) {
+		this.x = options.x;
+		this.y = options.y;
+		return;
+	}
+
+	isX = Math.round(Math.random()) === 0;
+
+	if (isX) {
+		this.x = Math.random() * a.width;
+		this.y = this.getStartPos(a.width);
+	} else {
+		this.y = Math.random() * a.height;
+		this.x = this.getStartPos(a.width);
+	}
+};
+
+Particle.prototype.getStartPos = function (length) {
+	var fromZero = Math.round(Math.random()) === 0;
+
+	return fromZero ? 0 - this.radius : length + this.radius;
 };
 
 Particle.prototype.move = function () {

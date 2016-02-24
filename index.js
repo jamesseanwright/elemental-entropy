@@ -173,8 +173,6 @@ function gameOver() {
 	isGameRunning = false;
 }
 
-var tick = Date.now();
-
 function loop() {
 	if (!isGameRunning) return;
 
@@ -184,8 +182,6 @@ function loop() {
 
 	shield.render();
 	Particle.next();
-
-	tick = Date.now();
 
 	requestAnimationFrame(loop);
 }

@@ -14,7 +14,7 @@ var PLAYER_RADIUS = 45;
 
 var shield = {
 	init: function () {
-		this.rotation = 0;
+		this.angle = 0;
 		this.radianModifier = 1;
 		this.radius = PLAYER_RADIUS + 30;
 		this.stroke = 'white';
@@ -43,6 +43,10 @@ var shield = {
 			start: (PI + this.radianModifier) - this.angle,
 			end: (PI + PI) - this.radianModifier - this.angle
 		};
+	},
+
+	detectCollision: function (collidable) {
+
 	}
 };
 
@@ -216,17 +220,15 @@ Particle.create({
 	x: PLAYER_X,
 	y: PLAYER_Y,
 	onHit: gameOver,
-	detectCollision: detectCollisionWithPlayer
+	detectCollision: detectRadialCollision
 });
 
-function detectCollisionWithPlayer(collidable) {
+function detectRadialCollision(collidable) {
 	var distanceX = (this.x + this.radius) - (collidable.x + collidable.radius);
 	var distanceY = (this.y + this.radius) - (collidable.y + collidable.radius);
 	var distance = Math.sqrt(distanceX * distanceX + distanceY * distanceY);
-	
 	return distance < this.radius + collidable.radius;
 }
-
 loop();
 
 function gameOver() {

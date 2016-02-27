@@ -1,4 +1,4 @@
-# Fire
+# Elemental Extravaganza
 
 My JS1K entry
 

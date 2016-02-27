@@ -26,22 +26,22 @@ var shield = {
 	
 	rotate: function (e) {
 		var centre = a.width / 2;
-		this.rotation = (PI - (e.clientX - centre)) / 100;
+		this.angle = (PI - (e.clientX - centre)) / 100;
 	},
 
 	render: function () {
-		var rotation = this.getRotation();
+		var angles = this.getAngles();
 
 		c.strokeStyle = this.stroke;
 		c.beginPath();
-		c.arc(PLAYER_X, PLAYER_Y, this.radius, rotation.start, rotation.end);
+		c.arc(PLAYER_X, PLAYER_Y, this.radius, angles.start, angles.end);
 		c.stroke();
 	},
 
-	getRotation: function () {
+	getAngles: function () {
 		return {
-			start: (PI + this.radianModifier) - this.rotation,
-			end: (PI + PI) - this.radianModifier - this.rotation,
+			start: (PI + this.radianModifier) - this.angle,
+			end: (PI + PI) - this.radianModifier - this.angle
 		};
 	}
 };

@@ -14,6 +14,8 @@ var PLAYER_RADIUS = 45;
 
 var shield = {
 	init: function () {
+		this.x = PLAYER_X;
+		this.y = PLAYER_Y;
 		this.angle = 0;
 		this.radianModifier = 1;
 		this.radius = PLAYER_RADIUS + 30;
@@ -31,10 +33,11 @@ var shield = {
 
 	render: function () {
 		var angles = this.getAngles();
+		console.log('shield angles:', angles.start, angles.end);
 
 		c.strokeStyle = this.stroke;
 		c.beginPath();
-		c.arc(PLAYER_X, PLAYER_Y, this.radius, angles.start, angles.end);
+		c.arc(this.x, this.y, this.radius, angles.start, angles.end);
 		c.stroke();
 	},
 
@@ -46,7 +49,21 @@ var shield = {
 	},
 
 	detectCollision: function (collidable) {
+		var angles = this.getAngles();
+		var collidableAngle = Math.atan2(collidable.x - this.x, collidable.y - this.y);
+		var isAngleCollision = collidableAngle >= angles.start && collidableAngle <= angles.end;
 
+		return detectRadialCollision(this, collidable) && isAngleCollision;
+	},
+
+	onHit: function (collidable) {
+		var xSpeed = collidable.xSpeed;
+		var ySpeed = collidable.ySpeed;
+
+		collidable.isReversing = true;
+
+		collidable.xSpeed = xSpeed > 0 ? -(xSpeed) : Math.abs(xSpeed);
+		collidable.ySpeed = ySpeed > 0 ? -(ySpeed) : Math.abs(ySpeed);
 	}
 };
 
@@ -199,9 +216,7 @@ var collider = {
 	},
 
 	detect: function (collidable) {
-		console.log('shield angle:', shield.angle);
-
-		if (collidable.isTarget) return;
+		if (collidable.isTarget || collidable.isReversing) return;
 
 		for (var i in this.targets) {
 			var target = this.targets[i];
@@ -213,6 +228,7 @@ var collider = {
 };
 
 shield.init();
+collider.addTarget(shield);
 
 Particle.create({
 	isPlayer: true,
@@ -220,15 +236,19 @@ Particle.create({
 	x: PLAYER_X,
 	y: PLAYER_Y,
 	onHit: gameOver,
-	detectCollision: detectRadialCollision
+	detectCollision: function detectCollision(collidable) {
+		return detectRadialCollision(this, collidable);
+	}
 });
 
-function detectRadialCollision(collidable) {
-	var distanceX = (this.x + this.radius) - (collidable.x + collidable.radius);
-	var distanceY = (this.y + this.radius) - (collidable.y + collidable.radius);
+function detectRadialCollision(p1, p2) {
+	var distanceX = (p1.x + p1.radius) - (p2.x + p2.radius);
+	var distanceY = (p1.y + p1.radius) - (p2.y + p2.radius);
 	var distance = Math.sqrt(distanceX * distanceX + distanceY * distanceY);
-	return distance < this.radius + collidable.radius;
+	
+	return distance < p1.radius + p2.radius;
 }
+
 loop();
 
 function gameOver() {

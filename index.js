@@ -49,15 +49,15 @@ var shield = {
 function Particle(options) {
 	options = options || {};
 	this.isPlayer = options.isPlayer;
-	this.isTarget = options.isTarget;
 	this.radius = options.radius || Particle.generateRadius();
 	this.fill = Particle.generateFill(this.isPlayer);
 	this.onHit = options.onHit;
+	this.detectCollision = options.detectCollision;
 
 	this.setPos(options);
 	this.setSpeed();
 
-	if (this.isTarget) collider.addTarget(this);
+	if (this.isPlayer) collider.addTarget(this);
 }
 
 Particle.baseRadius = 30;
@@ -190,18 +190,18 @@ var collider = {
 	targets: [],
 
 	addTarget: function (target) {
+		target.isTarget = true;
 		this.targets.push(target);
 	},
 
 	detect: function (collidable) {
+		console.log('shield angle:', shield.angle);
+
 		if (collidable.isTarget) return;
 
 		for (var i in this.targets) {
 			var target = this.targets[i];
-			var distanceX = (target.x + target.radius) - (collidable.x + collidable.radius);
-			var distanceY = (target.y + target.radius) - (collidable.y + collidable.radius);
-			var distance = Math.sqrt(distanceX * distanceX + distanceY * distanceY);
-			var isHit = distance < target.radius + collidable.radius;
+			var isHit = target.detectCollision(collidable)
 
 			if (isHit && target.onHit) target.onHit(collidable);
 		}
@@ -212,12 +212,20 @@ shield.init();
 
 Particle.create({
 	isPlayer: true,
-	isTarget: true,
 	radius: PLAYER_RADIUS,
 	x: PLAYER_X,
 	y: PLAYER_Y,
-	onHit: gameOver
+	onHit: gameOver,
+	detectCollision: detectCollisionWithPlayer
 });
+
+function detectCollisionWithPlayer(collidable) {
+	var distanceX = (this.x + this.radius) - (collidable.x + collidable.radius);
+	var distanceY = (this.y + this.radius) - (collidable.y + collidable.radius);
+	var distance = Math.sqrt(distanceX * distanceX + distanceY * distanceY);
+	
+	return distance < this.radius + collidable.radius;
+}
 
 loop();
 

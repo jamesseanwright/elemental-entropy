@@ -1,11 +1,17 @@
-'use strict';
+/* This software is protected by version 2 of
+ * the Apache License. If you fork and modify it,
+ * please attribute me as the author of the original
+ * project. You can of course protect your own modifications
+ * as and how you please. http://www.apache.org/licenses/LICENSE-2.0.txt
 
-/* The JS1K guys have made life easier by providing
+ * The JS1K guys have made life easier by providing
  * the following shim:
  * - a - a canvas element
  * - b - the body
  * - c - a's 2D context
  * - g - a's 3D context */
+
+'use strict';
 
 var PI = Math.PI;
 var PLAYER_X = a.width / 2;

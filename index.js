@@ -49,6 +49,7 @@ var shield = {
 function Particle(options) {
 	options = options || {};
 	this.isPlayer = options.isPlayer;
+	this.isTarget = options.isTarget;
 	this.radius = options.radius || Particle.generateRadius();
 	this.fill = Particle.generateFill(this.isPlayer);
 	this.onHit = options.onHit;
@@ -56,7 +57,7 @@ function Particle(options) {
 	this.setPos(options);
 	this.setSpeed();
 
-	if (this.isPlayer) collider.setTarget(this);
+	if (this.isTarget) collider.addTarget(this);
 }
 
 Particle.baseRadius = 30;
@@ -98,7 +99,7 @@ Particle.next = function () {
 		var particle = Particle.instances[i];
 		particle.render();
 
-		if (!particle.isPlayer) {
+		if (!particle.isTarget) {
 			particle.move();
 			particle.cleanup = particle.detectCleanup();
 		}
@@ -186,20 +187,24 @@ Particle.prototype.detectCleanup = function () {
 };
 
 var collider = {
-	setTarget: function (particle) {
-		this.target = particle;
+	targets: [],
+
+	addTarget: function (target) {
+		this.targets.push(target);
 	},
 
-	detect: function (particle) {
-		if (particle.isPlayer) return;
+	detect: function (collidable) {
+		if (collidable.isTarget) return;
 
-		var target = this.target;
-		var distanceX = (target.x + target.radius) - (particle.x + particle.radius);
-		var distanceY = (target.y + target.radius) - (particle.y + particle.radius);
-		var distance = Math.sqrt(distanceX * distanceX + distanceY * distanceY);
-		var isHit = distance < target.radius + particle.radius;
+		for (var i in this.targets) {
+			var target = this.targets[i];
+			var distanceX = (target.x + target.radius) - (collidable.x + collidable.radius);
+			var distanceY = (target.y + target.radius) - (collidable.y + collidable.radius);
+			var distance = Math.sqrt(distanceX * distanceX + distanceY * distanceY);
+			var isHit = distance < target.radius + collidable.radius;
 
-		if (isHit && target.onHit) target.onHit();
+			if (isHit && target.onHit) target.onHit(collidable);
+		}
 	}
 };
 
@@ -207,6 +212,7 @@ shield.init();
 
 Particle.create({
 	isPlayer: true,
+	isTarget: true,
 	radius: PLAYER_RADIUS,
 	x: PLAYER_X,
 	y: PLAYER_Y,

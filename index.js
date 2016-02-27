@@ -12,8 +12,6 @@ var PLAYER_X = a.width / 2;
 var PLAYER_Y = a.height / 2;
 var PLAYER_RADIUS = 45;
 
-var isGameRunning = true;
-
 var shield = {
 	init: function () {
 		this.rotation = 0;
@@ -53,6 +51,7 @@ function Particle(options) {
 	this.isPlayer = options.isPlayer;
 	this.radius = options.radius || Particle.generateRadius();
 	this.fill = Particle.generateFill(this.isPlayer);
+	this.onHit = options.onHit;
 
 	this.setPos(options);
 	this.setSpeed();
@@ -195,9 +194,10 @@ var collider = {
 		if (particle.isPlayer) return;
 
 		var target = this.target;
-		var isHit = particle.isFromLeft
-					? particle.x + particle.width >= target.x
-					: particle.x <= target.x + target.width;
+		var distanceX = (target.x + target.radius) - (particle.x + particle.radius);
+		var distanceY = (target.y + target.radius) - (particle.y + particle.radius);
+		var distance = Math.sqrt(distanceX * distanceX + distanceY * distanceY);
+		var isHit = distance < target.radius + particle.radius;
 
 		if (isHit && target.onHit) target.onHit();
 	}
@@ -216,12 +216,10 @@ Particle.create({
 loop();
 
 function gameOver() {
-	isGameRunning = false;
+	this.cleanup = true;
 }
 
 function loop() {
-	if (!isGameRunning) return;
-
 	c.clearRect(0, 0, a.width, a.height);
 	c.fillStyle = 'black';
 	c.fillRect(0, 0, a.width, a.height);

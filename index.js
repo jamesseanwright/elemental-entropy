@@ -182,7 +182,7 @@ Particle.prototype.setPos = function (options) {
 		return;
 	}
 
-	this.x = 100;
+	this.x = 700;
 	this.y = 0;
 	return;
 

@@ -21,7 +21,7 @@ var shield = {
 		this.x = PLAYER_X;
 		this.y = PLAYER_Y;
 		this.angle = 0;
-		this.radianModifier = 1;
+		this.radialModifier = 1;
 		this.radius = PLAYER_RADIUS + 30;
 		this.stroke = 'white';
 
@@ -31,7 +31,9 @@ var shield = {
 	},
 	
 	rotate: function (e) {
-		this.angle = (PI - (e.clientX - PLAYER_X)) / 100;
+		var distanceFromX = PLAYER_X - e.clientX;
+		this.angle = (PI * 2) * (distanceFromX / PLAYER_X);
+		console.log(this.angle);
 	},
 
 	render: function () {
@@ -45,15 +47,15 @@ var shield = {
 
 	getAngles: function () {
 		return {
-			start: (PI + PI) - this.radianModifier - this.angle,
-			end: (PI + this.radianModifier) - this.angle
+			start: (PI * 2) - this.radialModifier - this.angle,
+			end: (PI + this.radialModifier) - this.angle
 		};
 	},
 
 	detectCollision: function (collidable) {
 		if (!detectRadialCollision(this, collidable)) return false;
 
-		return isHit;
+		return false;
 	},
 
 	onHit: function (collidable) {

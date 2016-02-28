@@ -54,12 +54,12 @@ var shield = {
 	detectCollision: function (collidable) {
 		var shieldAngles;
 		var collidableAngle;
+
+		return detectRadialCollision(this, collidable);
 		
 		if (!detectRadialCollision(this, collidable)) return false;
-		console.log('radial collision');
 		shieldAngles = this.getAngles();
 		collidableAngle = Math.atan2(PLAYER_X - collidable.x, PLAYER_Y - collidable.y);
-		console.log(collidableAngle, shieldAngles, collidableAngle >= shieldAngles.start);
 		return collidableAngle >= shieldAngles.start && collidableAngle <= shieldAngles.end;
 	},
 
@@ -89,7 +89,7 @@ function Particle(options) {
 }
 
 Particle.baseRadius = 30;
-Particle.generationFrequencyMs = 10000;
+Particle.generationFrequencyMs = 1500;
 Particle.lastGeneration = Date.now() - Particle.generationFrequencyMs;
 Particle.instances = [];
 Particle.blur = 100;
@@ -182,10 +182,6 @@ Particle.prototype.setPos = function (options) {
 		return;
 	}
 
-	this.x = 700;
-	this.y = 0;
-	return;
-
 	isX = Math.round(Math.random()) === 0;
 
 	if (isX) {
@@ -259,11 +255,9 @@ Particle.create({
 });
 
 function detectRadialCollision(p1, p2) {
-	var distanceX = (p1.x + p1.radius) - (p2.x - p2.radius);
-	var distanceY = (p1.y + p1.radius) - (p2.y + p2.radius);
+	var distanceX = p1.x - p2.x;
+	var distanceY = p1.y - p2.y;
 	var distance = Math.sqrt(distanceX * distanceX + distanceY * distanceY);
-
-	console.log(distance, p1.radius, p2.radius, distance < p1.radius + p2.radius);
 	
 	return distance < p1.radius + p2.radius;
 }

@@ -33,7 +33,6 @@ var shield = {
 	rotate: function (e) {
 		var distanceFromX = a.width - e.clientX;
 		this.angle = (PI * 2) * (distanceFromX / a.width);
-		console.log(this.angle);
 	},
 
 	render: function () {
@@ -48,7 +47,7 @@ var shield = {
 	getAngles: function () {
 		return {
 			start: (PI * 2) - this.radialModifier - this.angle,
-			end: (PI + this.radialModifier) - this.angle
+			end: (PI + tshis.radialModifier) - this.angle
 		};
 	},
 

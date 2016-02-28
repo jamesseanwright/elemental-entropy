@@ -88,11 +88,13 @@ function Particle(options) {
 	if (this.isPlayer) collider.addTarget(this);
 }
 
-Particle.baseRadius = 30;
-Particle.generationFrequencyMs = 1500;
-Particle.lastGeneration = Date.now() - Particle.generationFrequencyMs;
+Particle.BASE_SPEED = 8;
+Particle.BASE_RADIUS = 30;
+Particle.GENERATION_FREQUENCY_MS = 1500;
+Particle.LAST_GENERATION = Date.now() - Particle.GENERATION_FREQUENCY_MS;
+Particle.BLUE = 100;
+
 Particle.instances = [];
-Particle.blur = 100;
 
 Particle.fills = {
 	player: 'blue',
@@ -100,7 +102,7 @@ Particle.fills = {
 };
 
 Particle.generateRadius = function () {
-	return Particle.baseRadius - (Math.ceil(Math.random() * Particle.baseRadius) / 2);
+	return Particle.BASE_RADIUS - (Math.ceil(Math.random() * Particle.BASE_RADIUS) / 2);
 };
 
 Particle.generateFill = function (isPlayer) {
@@ -144,18 +146,18 @@ Particle.cleanup = function () {
 
 Particle.tryGenerate = function () {
 	var now = Date.now();
-	var shouldGenerate = now - Particle.lastGeneration >= Particle.generationFrequencyMs;
+	var shouldGenerate = now - Particle.LAST_GENERATION >= Particle.GENERATION_FREQUENCY_MS;
 
 	if (shouldGenerate) {
 		Particle.create();
-		Particle.lastGeneration = now;
+		Particle.LAST_GENERATION = now;
 	}
 };
 
 Particle.prototype.render = function () {
 	c.fillStyle = this.fill;
 	c.shadowColor = this.fill;
-	c.shadowBlur = Particle.blur;
+	c.shadowBlur = Particle.BLUE;
 	c.beginPath();
 	c.arc(this.x, this.y, this.radius, 0, PI * 2);
 	c.fill();
@@ -166,7 +168,7 @@ Particle.prototype.setSpeed = function () {
 	var distanceFromX = PLAYER_X - this.x;
 	var distanceFromY = PLAYER_Y - this.y;
 	var aspectRatio =  a.height / a.width;
-	var speed = 3;
+	var speed = Particle.BASE_SPEED - ((Math.random() * Particle.BASE_SPEED) / 3);
 
 	this.xSpeed = speed * (distanceFromX / PLAYER_X);
 	this.ySpeed = (speed * (distanceFromY / PLAYER_Y)) * aspectRatio;

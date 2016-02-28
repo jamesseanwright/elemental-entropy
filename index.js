@@ -24,6 +24,7 @@ var HUD_Y = 40;
 
 var score = 0;
 var level = 0;
+var isGameActive = true;
 
 var shield = {
 	init: function () {
@@ -247,7 +248,7 @@ var collider = {
 	},
 
 	detect: function (collidable) {
-		if (collidable.isTarget || collidable.isReversing) return;
+		if (collidable.isTarget || collidable.isReversing || !isGameActive) return;
 
 		for (var i in this.targets) {
 			var target = this.targets[i];
@@ -291,6 +292,7 @@ loop();
 function gameOver() {
 	this.cleanup = true;
 	collider.removeTarget(this);
+	isGameActive = false;
 }
 
 function loop() {

@@ -68,7 +68,7 @@ var shield = {
 		if (!detectRadialCollision(this, collidable)) return false;
 		
 		shieldAngles = this.getAngles();
-		collidableAngle = Math.atan2(PLAYER_X - collidable.x, PLAYER_Y - collidable.y);
+		collidableAngle = Math.atan2(collidable.x - PLAYER_X, collidable.y - PLAYER_Y);
 		
 		console.log(collidableAngle, shieldAngles);
 
@@ -248,7 +248,7 @@ var collider = {
 	},
 
 	detect: function (collidable) {
-		if (collidable.isTarget || collidable.isReversing || !isGameActive) return;
+		if (collidable.isTarget || collidable.isReversing) return;
 
 		for (var i in this.targets) {
 			var target = this.targets[i];

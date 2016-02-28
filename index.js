@@ -46,15 +46,21 @@ var shield = {
 
 	getAngles: function () {
 		return {
-			start: (PI * 2) - this.radialModifier - this.angle,
-			end: (PI + tshis.radialModifier) - this.angle
+			start: this.radialModifier - this.angle,
+			end: PI + (this.radialModifier - this.angle)
 		};
 	},
 
 	detectCollision: function (collidable) {
-		if (!detectRadialCollision(this, collidable)) return false;
-
-		return false;
+		var shieldAngles;
+		var collidableAngle;
+		
+		if (!detectRadialCollision(collidable, this)) return false;
+		console.log('radial collision');
+		shieldAngles = this.getAngles();
+		collidableAngle = Math.atan2(PLAYER_X - collidable.x, PLAYER_Y - collidable.y);
+		console.log(collidableAngle, shieldAngles, collidableAngle >= shieldAngles.start);
+		return collidableAngle >= shieldAngles.start && collidableAngle <= shieldAngles.end;
 	},
 
 	onHit: function (collidable) {
@@ -83,7 +89,7 @@ function Particle(options) {
 }
 
 Particle.baseRadius = 30;
-Particle.generationFrequencyMs = 1500;
+Particle.generationFrequencyMs = 10000;
 Particle.lastGeneration = Date.now() - Particle.generationFrequencyMs;
 Particle.instances = [];
 Particle.blur = 100;
@@ -176,7 +182,7 @@ Particle.prototype.setPos = function (options) {
 		return;
 	}
 
-	this.x = 0;
+	this.x = 100;
 	this.y = 0;
 	return;
 
@@ -220,6 +226,12 @@ var collider = {
 		this.targets.push(target);
 	},
 
+	removeTarget: function (target) {
+		this.targets = this.targets.filter(function (t) {
+			return target !== t;
+		});
+	},
+
 	detect: function (collidable) {
 		if (collidable.isTarget || collidable.isReversing) return;
 
@@ -241,14 +253,14 @@ Particle.create({
 	x: PLAYER_X,
 	y: PLAYER_Y,
 	onHit: gameOver,
-	detectCollision: function detectCollision(collidable) {
+	detectCollision: function (collidable) {
 		return detectRadialCollision(this, collidable);
 	}
 });
 
 function detectRadialCollision(p1, p2) {
-	var distanceX = (p1.x + p1.radius) - (p2.x + p2.radius);
-	var distanceY = (p1.y + p1.radius) - (p2.y + p2.radius);
+	var distanceX = p1.x - p2.x;
+	var distanceY = p1.y - p2.y;
 	var distance = Math.sqrt(distanceX * distanceX + distanceY * distanceY);
 	
 	return distance < p1.radius + p2.radius;
@@ -258,6 +270,7 @@ loop();
 
 function gameOver() {
 	this.cleanup = true;
+	collider.removeTarget(this);
 }
 
 function loop() {

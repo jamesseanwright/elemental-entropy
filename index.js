@@ -11,8 +11,6 @@
  * - c - a's 2D context
  * - g - a's 3D context */
 
-'use strict';
-
 var PI = Math.PI;
 var PLAYER_X = a.width / 2;
 var PLAYER_Y = a.height / 2;
@@ -33,33 +31,29 @@ var shield = {
 	},
 	
 	rotate: function (e) {
-		var centre = a.width / 2;
-		this.angle = (PI - (e.clientX - centre)) / 100;
+		this.angle = (PI - (e.clientX - PLAYER_X)) / 100;
 	},
 
 	render: function () {
 		var angles = this.getAngles();
-		console.log('shield angles:', angles.start, angles.end);
 
 		c.strokeStyle = this.stroke;
 		c.beginPath();
-		c.arc(this.x, this.y, this.radius, angles.start, angles.end);
+		c.arc(this.x, this.y, this.radius, angles.start, angles.end, true);
 		c.stroke();
 	},
 
 	getAngles: function () {
 		return {
-			start: (PI + this.radianModifier) - this.angle,
-			end: (PI + PI) - this.radianModifier - this.angle
+			start: (PI + PI) - this.radianModifier - this.angle,
+			end: (PI + this.radianModifier) - this.angle
 		};
 	},
 
 	detectCollision: function (collidable) {
-		var angles = this.getAngles();
-		var collidableAngle = Math.atan2(collidable.x - this.x, collidable.y - this.y);
-		var isAngleCollision = collidableAngle >= angles.start && collidableAngle <= angles.end;
+		if (!detectRadialCollision(this, collidable)) return false;
 
-		return detectRadialCollision(this, collidable) && isAngleCollision;
+		return isHit;
 	},
 
 	onHit: function (collidable) {
@@ -88,9 +82,9 @@ function Particle(options) {
 }
 
 Particle.baseRadius = 30;
-Particle.generationFrequencyMs = 1200;
+Particle.generationFrequencyMs = 1500;
 Particle.lastGeneration = Date.now() - Particle.generationFrequencyMs;
-Particle.instances = []; // TODO: collect instances that have left screen
+Particle.instances = [];
 Particle.blur = 100;
 
 Particle.fills = {
@@ -165,7 +159,7 @@ Particle.prototype.setSpeed = function () {
 	var distanceFromX = PLAYER_X - this.x;
 	var distanceFromY = PLAYER_Y - this.y;
 	var aspectRatio =  a.height / a.width;
-	var speed = 8;
+	var speed = 3;
 
 	this.xSpeed = speed * (distanceFromX / PLAYER_X);
 	this.ySpeed = (speed * (distanceFromY / PLAYER_Y)) * aspectRatio;
@@ -180,6 +174,10 @@ Particle.prototype.setPos = function (options) {
 		this.y = options.y;
 		return;
 	}
+
+	this.x = 0;
+	this.y = 0;
+	return;
 
 	isX = Math.round(Math.random()) === 0;
 
@@ -266,8 +264,8 @@ function loop() {
 	c.fillStyle = 'black';
 	c.fillRect(0, 0, a.width, a.height);
 
-	shield.render();
 	Particle.next();
+	shield.render();
 
 	requestAnimationFrame(loop);
 }

@@ -31,8 +31,9 @@ var shield = {
 	},
 	
 	rotate: function (e) {
-		var distanceFromX = PLAYER_X - e.clientX;
-		this.angle = (PI * 2) * (distanceFromX / PLAYER_X);
+		var distanceFromX = a.width - e.clientX;
+		this.angle = (PI * 2) * (distanceFromX / a.width);
+		console.log(this.angle);
 	},
 
 	render: function () {

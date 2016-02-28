@@ -16,7 +16,7 @@ else
 fi
 
 cp $html_file $out_dir
-uglifyjs $script --compress --screw-ie8 --mangle "sort,toplevel" --source-map $out_dir/$source_map --source-map-url $source_map --source-map-root $script > $out_dir/index.min.js
+uglifyjs $script --compress --screw-ie8 --source-map $out_dir/$source_map --source-map-url $source_map --source-map-root $script > $out_dir/index.min.js
 
 # Can't use sed as curly braces are metacharacters :(
 echo "Minified to $out_dir/index.min.js, but going to inject into $html_file..."

@@ -15,6 +15,15 @@ var PI = Math.PI;
 var PLAYER_X = a.width / 2;
 var PLAYER_Y = a.height / 2;
 var PLAYER_RADIUS = 45;
+var LEVEL_INCREASE_THRESHOLD = 100;
+var HIT_SCORE = 10;
+var HUD_COLOUR = 'white';
+var HUD_FONT = '26px ARIAL';
+var HUD_X = 20;
+var HUD_Y = 40;
+
+var score = 0;
+var level = 0;
 
 var shield = {
 	init: function () {
@@ -55,11 +64,13 @@ var shield = {
 		var shieldAngles;
 		var collidableAngle;
 
-		return detectRadialCollision(this, collidable);
-		
 		if (!detectRadialCollision(this, collidable)) return false;
+		
 		shieldAngles = this.getAngles();
 		collidableAngle = Math.atan2(PLAYER_X - collidable.x, PLAYER_Y - collidable.y);
+		
+		console.log(collidableAngle, shieldAngles);
+
 		return collidableAngle >= shieldAngles.start && collidableAngle <= shieldAngles.end;
 	},
 
@@ -71,6 +82,8 @@ var shield = {
 
 		collidable.xSpeed = xSpeed > 0 ? -(xSpeed) : Math.abs(xSpeed);
 		collidable.ySpeed = ySpeed > 0 ? -(ySpeed) : Math.abs(ySpeed);
+
+		onScore();
 	}
 };
 
@@ -91,10 +104,11 @@ function Particle(options) {
 Particle.BASE_SPEED = 8;
 Particle.BASE_RADIUS = 30;
 Particle.GENERATION_FREQUENCY_MS = 1500;
-Particle.LAST_GENERATION = Date.now() - Particle.GENERATION_FREQUENCY_MS;
 Particle.BLUE = 100;
+Particle.GEN_DEDUCTION_MS = 250;
 
 Particle.instances = [];
+Particle.lastGeneration = Date.now() - Particle.GENERATION_FREQUENCY_MS;
 
 Particle.fills = {
 	player: 'blue',
@@ -146,11 +160,13 @@ Particle.cleanup = function () {
 
 Particle.tryGenerate = function () {
 	var now = Date.now();
-	var shouldGenerate = now - Particle.LAST_GENERATION >= Particle.GENERATION_FREQUENCY_MS;
+	var frequency = Particle.GENERATION_FREQUENCY_MS - (Particle.GEN_DEDUCTION_MS * level);
+
+	var shouldGenerate = now - Particle.lastGeneration >= Particle.GENERATION_FREQUENCY_MS;
 
 	if (shouldGenerate) {
 		Particle.create();
-		Particle.LAST_GENERATION = now;
+		Particle.lastGeneration = now;
 	}
 };
 
@@ -264,6 +280,12 @@ function detectRadialCollision(p1, p2) {
 	return distance < p1.radius + p2.radius;
 }
 
+function onScore() {
+	score += HIT_SCORE;
+
+	if (score % LEVEL_INCREASE_THRESHOLD === 0) level++;
+}
+
 loop();
 
 function gameOver() {
@@ -278,6 +300,13 @@ function loop() {
 
 	Particle.next();
 	shield.render();
+	renderHUD();
 
 	requestAnimationFrame(loop);
+}
+
+function renderHUD() {
+	c.fillStyle = HUD_COLOUR;
+	c.font = HUD_FONT;
+	c.fillText(score + ' (level ' + level + ')', HUD_X, HUD_Y);
 }

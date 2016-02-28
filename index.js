@@ -55,7 +55,7 @@ var shield = {
 		var shieldAngles;
 		var collidableAngle;
 		
-		if (!detectRadialCollision(collidable, this)) return false;
+		if (!detectRadialCollision(this, collidable)) return false;
 		console.log('radial collision');
 		shieldAngles = this.getAngles();
 		collidableAngle = Math.atan2(PLAYER_X - collidable.x, PLAYER_Y - collidable.y);
@@ -259,9 +259,11 @@ Particle.create({
 });
 
 function detectRadialCollision(p1, p2) {
-	var distanceX = p1.x - p2.x;
-	var distanceY = p1.y - p2.y;
+	var distanceX = (p1.x + p1.radius) - (p2.x - p2.radius);
+	var distanceY = (p1.y + p1.radius) - (p2.y + p2.radius);
 	var distance = Math.sqrt(distanceX * distanceX + distanceY * distanceY);
+
+	console.log(distance, p1.radius, p2.radius, distance < p1.radius + p2.radius);
 	
 	return distance < p1.radius + p2.radius;
 }

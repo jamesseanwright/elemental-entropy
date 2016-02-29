@@ -42,7 +42,10 @@ var shield = {
 	
 	rotate: function (e) {
 		var distanceFromX = a.width - e.clientX;
-		this.angle = (PI * 2) * (distanceFromX / a.width);
+		this.angle = ((PI * 2) * (distanceFromX / a.width)) - PI;
+
+		console.log(this.angle);
+		console.log(this.getAngles());
 	},
 
 	render: function () {
@@ -69,9 +72,7 @@ var shield = {
 		
 		shieldAngles = this.getAngles();
 		collidableAngle = Math.atan2(collidable.x - PLAYER_X, collidable.y - PLAYER_Y);
-		
-		console.log(collidableAngle, shieldAngles);
-
+		console.log('c', collidableAngle);
 		return collidableAngle >= shieldAngles.start && collidableAngle <= shieldAngles.end;
 	},
 
@@ -104,9 +105,9 @@ function Particle(options) {
 
 Particle.BASE_SPEED = 8;
 Particle.BASE_RADIUS = 30;
-Particle.GENERATION_FREQUENCY_MS = 1500;
+Particle.GENERATION_FREQUENCY_MS = 10000;
 Particle.BLUE = 100;
-Particle.GEN_DEDUCTION_MS = 250;
+Particle.GEN_DEDUCTION_MS = 125;
 
 Particle.instances = [];
 Particle.lastGeneration = Date.now() - Particle.GENERATION_FREQUENCY_MS;
@@ -163,7 +164,7 @@ Particle.tryGenerate = function () {
 	var now = Date.now();
 	var frequency = Particle.GENERATION_FREQUENCY_MS - (Particle.GEN_DEDUCTION_MS * level);
 
-	var shouldGenerate = now - Particle.lastGeneration >= Particle.GENERATION_FREQUENCY_MS;
+	var shouldGenerate = now - Particle.lastGeneration >= frequency;
 
 	if (shouldGenerate) {
 		Particle.create();

@@ -41,8 +41,8 @@ var shield = {
 	},
 	
 	rotate: function (e) {
-		var distanceFromX = a.width - e.clientX;
-		this.angle = ((PI * 2) * (distanceFromX / a.width)) - PI;
+		var distanceFromX = e.clientX - a.width;
+		this.angle = (PI) * (distanceFromX / a.width) + (PI / 2);
 
 		console.log(this.angle);
 		console.log(this.getAngles());
@@ -53,14 +53,14 @@ var shield = {
 
 		c.strokeStyle = this.stroke;
 		c.beginPath();
-		c.arc(this.x, this.y, this.radius, angles.start, angles.end, true);
+		c.arc(this.x, this.y, this.radius, angles.start, angles.end);
 		c.stroke();
 	},
 
 	getAngles: function () {
 		return {
-			start: this.radialModifier - this.angle,
-			end: PI + (this.radialModifier - this.angle)
+			start: this.angle - PI / 2,
+			end: this.angle + PI / 2
 		};
 	},
 
@@ -71,7 +71,7 @@ var shield = {
 		if (!detectRadialCollision(this, collidable)) return false;
 		
 		shieldAngles = this.getAngles();
-		collidableAngle = Math.atan2(collidable.x - PLAYER_X, collidable.y - PLAYER_Y);
+		collidableAngle = Math.atan2(collidable.y - PLAYER_Y, collidable.x - PLAYER_X);
 		console.log('c', collidableAngle);
 		return collidableAngle >= shieldAngles.start && collidableAngle <= shieldAngles.end;
 	},

@@ -100,7 +100,7 @@ function Particle(options) {
 	this.setPos(options);
 	this.setSpeed();
 
-	if (this.isPlayer) collider.addTarget(this);
+	if (this.isPlayer) collider.addTarget.call(collider, this); // l33t h4x for Closure Compiler
 }
 
 Particle.BASE_SPEED = 8;
@@ -261,7 +261,7 @@ var collider = {
 };
 
 shield.init();
-collider.addTarget(shield);
+collider.addTarget.call(collider, shield);
 
 Particle.create({
 	isPlayer: true,

@@ -21,6 +21,7 @@ var HUD_COLOUR = 'white';
 var HUD_FONT = '26px ARIAL';
 var HUD_X = 20;
 var HUD_Y = 40;
+var H_PADDING = 100;
 
 var score = 0;
 var level = 0;
@@ -35,17 +36,17 @@ var shield = {
 		this.radius = PLAYER_RADIUS + 30;
 		this.stroke = 'white';
 
-		a.addEventListener('mousemove', function (e) { 
-			this.rotate(e);
+		a.addEventListener('mousemove', function (e) {
+			if (e.clientX > H_PADDING && e.clientX < a.width - H_PADDING) {
+				this.rotate(e);
+			}
 		}.bind(this));
 	},
 	
 	rotate: function (e) {
+		console.log(e.clientX);
 		var distanceFromX = e.clientX - a.width;
-		this.angle = (PI) * (distanceFromX / a.width) + (PI / 2);
-
-		console.log(this.angle);
-		console.log(this.getAngles());
+		this.angle = (PI * 2) * (distanceFromX / a.width) + PI;
 	},
 
 	render: function () {
@@ -59,8 +60,8 @@ var shield = {
 
 	getAngles: function () {
 		return {
-			start: this.angle - PI / 2,
-			end: this.angle + PI / 2
+			start: this.angle - PI / 4,
+			end: this.angle + PI / 4
 		};
 	},
 
@@ -72,7 +73,7 @@ var shield = {
 		
 		shieldAngles = this.getAngles();
 		collidableAngle = Math.atan2(collidable.y - PLAYER_Y, collidable.x - PLAYER_X);
-		console.log('c', collidableAngle);
+		console.log(shieldAngles);
 		return collidableAngle >= shieldAngles.start && collidableAngle <= shieldAngles.end;
 	},
 
@@ -103,9 +104,9 @@ function Particle(options) {
 	if (this.isPlayer) collider.addTarget.call(collider, this); // l33t h4x for Closure Compiler
 }
 
-Particle.BASE_SPEED = 8;
+Particle.BASE_SPEED = 5;
 Particle.BASE_RADIUS = 30;
-Particle.GENERATION_FREQUENCY_MS = 10000;
+Particle.GENERATION_FREQUENCY_MS = 2000;
 Particle.BLUE = 100;
 Particle.GEN_DEDUCTION_MS = 125;
 
@@ -249,7 +250,7 @@ var collider = {
 	},
 
 	detect: function (collidable) {
-		if (collidable.isTarget || collidable.isReversing) return;
+		if (collidable.isTarget || collidable.isReversing || !isGameActive) return;
 
 		for (var i in this.targets) {
 			var target = this.targets[i];
@@ -312,4 +313,6 @@ function renderHUD() {
 	c.fillStyle = HUD_COLOUR;
 	c.font = HUD_FONT;
 	c.fillText(score + ' (level ' + level + ')', HUD_X, HUD_Y);
+
+	if (!isGameActive) c.fillText('GAME OVER', PLAYER_X - 60, PLAYER_Y);
 }

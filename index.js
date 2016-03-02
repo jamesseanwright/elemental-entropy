@@ -11,16 +11,11 @@
  * - c - a's 2D context
  * - g - a's 3D context */
 
-var PI = Math.PI;
 var PLAYER_X = a.width / 2;
 var PLAYER_Y = a.height / 2;
 var PLAYER_RADIUS = 45;
 var LEVEL_INCREASE_THRESHOLD = 100;
 var HIT_SCORE = 10;
-var HUD_COLOUR = 'white';
-var HUD_FONT = '26px ARIAL';
-var HUD_X = 20;
-var HUD_Y = 40;
 var H_PADDING = 100;
 
 var score = 0;
@@ -32,25 +27,23 @@ var shield = {
 		this.x = PLAYER_X;
 		this.y = PLAYER_Y;
 		this.angle = 0;
-		this.radialModifier = 1;
 		this.radius = PLAYER_RADIUS + 30;
-		this.stroke = 'white';
 
 		a.addEventListener('mousemove', function (e) {
-			// h4x for RegPack :(
-			(e.clientX > H_PADDING && e.clientX < a.width - H_PADDING) && this.rotate(e);
-		}.bind(this));
+			// hax for RegPack :(
+			(e.clientX > H_PADDING && e.clientX < a.width - H_PADDING) && shield.rotate(e);
+		});
 	},
 	
 	rotate: function (e) {
 		var distanceFromX = e.clientX - a.width;
-		this.angle = (PI * 2) * (distanceFromX / a.width) + PI;
+		this.angle = (Math.PI * 2) * (distanceFromX / a.width) + Math.PI;
 	},
 
 	render: function () {
 		var angles = this.getAngles();
 
-		c.strokeStyle = this.stroke;
+		c.strokeStyle = 'white';
 		c.beginPath();
 		c.arc(this.x, this.y, this.radius, angles.start, angles.end);
 		c.stroke();
@@ -58,8 +51,8 @@ var shield = {
 
 	getAngles: function () {
 		return {
-			start: this.angle - PI / 4,
-			end: this.angle + PI / 4
+			start: this.angle - Math.PI / 4,
+			end: this.angle + Math.PI / 4
 		};
 	},
 
@@ -98,7 +91,7 @@ function Particle(options) {
 	this.setPos(options);
 	this.setSpeed();
 
-	if (this.isPlayer) collider.addTarget.call(collider, this); // l33t h4x for Closure Compiler
+	if (this.isPlayer) collider.addTarget.call(collider, this); // l33t h4x for Closure ComMath.piler
 }
 
 Particle.BASE_SPEED = 5;
@@ -175,9 +168,8 @@ Particle.prototype.render = function () {
 	c.shadowColor = this.fill;
 	c.shadowBlur = Particle.BLUE;
 	c.beginPath();
-	c.arc(this.x, this.y, this.radius, 0, PI * 2);
+	c.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
 	c.fill();
-	c.closePath();
 };
 
 Particle.prototype.setSpeed = function () {
@@ -300,7 +292,6 @@ function gameOver() {
 }
 
 function loop() {
-	c.clearRect(0, 0, a.width, a.height);
 	c.fillStyle = 'black';
 	c.fillRect(0, 0, a.width, a.height);
 
@@ -312,9 +303,9 @@ function loop() {
 }
 
 function renderHUD() {
-	c.fillStyle = HUD_COLOUR;
-	c.font = HUD_FONT;
-	c.fillText(score + ' - lvl ' + level, HUD_X, HUD_Y);
+	c.fillStyle = 'white';
+	c.font = '26px ARIAL';
+	c.fillText(score + ' - lvl ' + level, 20, 40);
 
 	if (!isGameActive) c.fillText('GAME OVER', PLAYER_X - 80, PLAYER_Y);
 }

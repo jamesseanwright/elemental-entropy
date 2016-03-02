@@ -44,7 +44,6 @@ var shield = {
 	},
 	
 	rotate: function (e) {
-		console.log(e.clientX);
 		var distanceFromX = e.clientX - a.width;
 		this.angle = (PI * 2) * (distanceFromX / a.width) + PI;
 	},
@@ -73,7 +72,6 @@ var shield = {
 		
 		shieldAngles = this.getAngles();
 		collidableAngle = Math.atan2(collidable.y - PLAYER_Y, collidable.x - PLAYER_X);
-		console.log(shieldAngles);
 		return collidableAngle >= shieldAngles.start && collidableAngle <= shieldAngles.end;
 	},
 
@@ -106,9 +104,9 @@ function Particle(options) {
 
 Particle.BASE_SPEED = 5;
 Particle.BASE_RADIUS = 30;
-Particle.GENERATION_FREQUENCY_MS = 2000;
+Particle.GENERATION_FREQUENCY_MS = 1500;
 Particle.BLUE = 100;
-Particle.GEN_DEDUCTION_MS = 125;
+Particle.GEN_DEDUCTION_MS = 100;
 
 Particle.instances = [];
 Particle.lastGeneration = Date.now() - Particle.GENERATION_FREQUENCY_MS;
@@ -209,7 +207,12 @@ Particle.prototype.setPos = function (options) {
 		this.x = Math.random() * a.width;
 		this.y = this.getStartPos(a.width);
 	} else {
-		this.y = Math.random() * a.height;
+		// nasty hack to overcome shield dead spot bug :(
+		var preCentre = Math.round(Math.random()) === 0;
+		var start = a.height / 6;
+		start = start - Math.random() * start;
+
+		this.y = preCentre ? start : a.height - start;
 		this.x = this.getStartPos(a.width);
 	}
 };
@@ -312,7 +315,7 @@ function loop() {
 function renderHUD() {
 	c.fillStyle = HUD_COLOUR;
 	c.font = HUD_FONT;
-	c.fillText(score + ' (level ' + level + ')', HUD_X, HUD_Y);
+	c.fillText(score + ' - lvl ' + level, HUD_X, HUD_Y);
 
-	if (!isGameActive) c.fillText('GAME OVER', PLAYER_X - 60, PLAYER_Y);
+	if (!isGameActive) c.fillText('GAME OVER', PLAYER_X - 80, PLAYER_Y);
 }

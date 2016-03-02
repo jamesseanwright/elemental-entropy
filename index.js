@@ -83,7 +83,7 @@ var shield = {
 function Particle(options) {
 	options = options || {};
 	this.isPlayer = options.isPlayer;
-	this.radius = options.radius || Particle.generateRadius();
+	this.radius = options.radius || Particle.RADIUS;
 	this.fill = Particle.generateFill(this.isPlayer);
 	this.onHit = options.onHit;
 	this.detectCollision = options.detectCollision;
@@ -91,11 +91,11 @@ function Particle(options) {
 	this.setPos(options);
 	this.setSpeed();
 
-	if (this.isPlayer) collider.addTarget.call(collider, this); // l33t h4x for Closure ComMath.piler
+	if (this.isPlayer) collider.addTarget.call(collider, this); // l33t h4x for Closure Compiler
 }
 
-Particle.BASE_SPEED = 5;
-Particle.BASE_RADIUS = 30;
+Particle.SPEED = 5;
+Particle.RADIUS = 25;
 Particle.GENERATION_FREQUENCY_MS = 1500;
 Particle.BLUE = 100;
 Particle.GEN_DEDUCTION_MS = 100;
@@ -106,10 +106,6 @@ Particle.lastGeneration = Date.now() - Particle.GENERATION_FREQUENCY_MS;
 Particle.fills = {
 	player: 'blue',
 	other: ['orange', '#008080']
-};
-
-Particle.generateRadius = function () {
-	return Particle.BASE_RADIUS - (Math.ceil(Math.random() * Particle.BASE_RADIUS) / 2);
 };
 
 Particle.generateFill = function (isPlayer) {
@@ -176,10 +172,9 @@ Particle.prototype.setSpeed = function () {
 	var distanceFromX = PLAYER_X - this.x;
 	var distanceFromY = PLAYER_Y - this.y;
 	var aspectRatio =  a.height / a.width;
-	var speed = Particle.BASE_SPEED - ((Math.random() * Particle.BASE_SPEED) / 3);
 
-	this.xSpeed = speed * (distanceFromX / PLAYER_X);
-	this.ySpeed = (speed * (distanceFromY / PLAYER_Y)) * aspectRatio;
+	this.xSpeed = Particle.SPEED * (distanceFromX / PLAYER_X);
+	this.ySpeed = (Particle.SPEED * (distanceFromY / PLAYER_Y)) * aspectRatio;
 };
 
 Particle.prototype.setPos = function (options) {

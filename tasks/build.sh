@@ -19,7 +19,7 @@ fi
 cp $html_file $out_dir
 
 echo "Minifying with Closure Compiler..."
-closure-compiler --js $script --js_output_file $out_dir/$min_script --compilation_level ADVANCED_OPTIMIZATIONS --externs "externs.js" --warning_level QUIET
+closure-compiler --js $script --js_output_file $out_dir/$min_script --compilation_level ADVANCED_OPTIMIZATIONS --externs "externs.js" --warning_level QUIET --language_in ECMASCRIPT5 --language_out ECMASCRIPT5
 
 echo "TODO: automate RegPack..."
 

@@ -37,9 +37,8 @@ var shield = {
 		this.stroke = 'white';
 
 		a.addEventListener('mousemove', function (e) {
-			if (e.clientX > H_PADDING && e.clientX < a.width - H_PADDING) {
-				this.rotate(e);
-			}
+			// h4x for RegPack :(
+			(e.clientX > H_PADDING && e.clientX < a.width - H_PADDING) && this.rotate(e);
 		}.bind(this));
 	},
 	

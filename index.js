@@ -80,7 +80,7 @@ var shield = {
 	}
 };
 
-function Particle(options) {
+var Particle = function(options) {
 	options = options || {};
 	this.isPlayer = options.isPlayer;
 	this.radius = options.radius || Particle.RADIUS;
@@ -264,7 +264,7 @@ Particle.create({
 	}
 });
 
-function detectRadialCollision(p1, p2) {
+var detectRadialCollision = function (p1, p2) {
 	var distanceX = p1.x - p2.x;
 	var distanceY = p1.y - p2.y;
 	var distance = Math.sqrt(distanceX * distanceX + distanceY * distanceY);
@@ -272,7 +272,7 @@ function detectRadialCollision(p1, p2) {
 	return distance < p1.radius + p2.radius;
 }
 
-function onScore() {
+var onScore = function() {
 	score += HIT_SCORE;
 
 	if (score % LEVEL_INCREASE_THRESHOLD === 0) level++;
@@ -280,13 +280,13 @@ function onScore() {
 
 loop();
 
-function gameOver() {
+var gameOver = function() {
 	this.cleanup = true;
 	collider.removeTarget(this);
 	isGameActive = false;
 }
 
-function loop() {
+var loop = function() {
 	c.fillStyle = 'black';
 	c.fillRect(0, 0, a.width, a.height);
 
@@ -297,7 +297,7 @@ function loop() {
 	requestAnimationFrame(loop);
 }
 
-function renderHUD() {
+var renderHUD = function() {
 	c.fillStyle = 'white';
 	c.font = '26px ARIAL';
 	c.fillText(score + ' - lvl ' + level, 20, 40);

@@ -29,10 +29,10 @@ var shield = {
 		this.angle = 0;
 		this.radius = PLAYER_RADIUS + 30;
 
-		a.addEventListener('mousemove', function (e) {
+		a.onmousemove = function (e) {
 			// hax for RegPack :(
 			(e.clientX > H_PADDING && e.clientX < a.width - H_PADDING) && shield.r(e);
-		});
+		};
 	},
 	
 	r: function (e) {

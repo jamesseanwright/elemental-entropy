@@ -31,11 +31,11 @@ var shield = {
 
 		a.addEventListener('mousemove', function (e) {
 			// hax for RegPack :(
-			(e.clientX > H_PADDING && e.clientX < a.width - H_PADDING) && shield.rotate(e);
+			(e.clientX > H_PADDING && e.clientX < a.width - H_PADDING) && shield.r(e);
 		});
 	},
 	
-	rotate: function (e) {
+	r: function (e) {
 		this.angle = (Math.PI * 2) * ((e.clientX - a.width) / a.width) + Math.PI;
 	},
 
@@ -70,8 +70,8 @@ var shield = {
 
 		collidable.isReversing = true;
 
-		collidable.xSpeed = xSpeed > 0 ? -(xSpeed) : Math.abs(xSpeed);
-		collidable.ySpeed = ySpeed > 0 ? -(ySpeed) : Math.abs(ySpeed);
+		collidable.xSpeed = xSpeed * -1; // much easier than Math.abs and -() :D
+		collidable.ySpeed = ySpeed * -1;
 
 		onScore();
 	}

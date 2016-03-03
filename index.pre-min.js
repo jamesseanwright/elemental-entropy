@@ -279,5 +279,5 @@ var renderHUD = function() {
 	c.font = '26px Arial';
 	c.fillText(score, 20, 40);
 
-	if (!isGameActive) c.fillText('GAME OVER', PLAYER_X - 80, PLAYER_Y);
+	if (!isGameActive) c.fillText('BOOM', PLAYER_X - 40, PLAYER_Y);
 }

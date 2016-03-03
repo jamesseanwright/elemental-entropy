@@ -97,7 +97,7 @@ var Particle = function(options) {
 Particle.SPEED = 5;
 Particle.RADIUS = 25;
 Particle.GENERATION_FREQUENCY_MS = 1500;
-Particle.BLUE = 100;
+Particle.BLUR = 100;
 Particle.GEN_DEDUCTION_MS = 100;
 
 Particle.instances = [];
@@ -162,7 +162,7 @@ Particle.tryGenerate = function () {
 Particle.prototype.render = function () {
 	c.fillStyle = this.fill;
 	c.shadowColor = this.fill;
-	c.shadowBlur = Particle.BLUE;
+	c.shadowBlur = Particle.BLUR;
 	c.beginPath();
 	c.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
 	c.fill();

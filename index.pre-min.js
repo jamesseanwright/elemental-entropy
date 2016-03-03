@@ -36,8 +36,7 @@ var shield = {
 	},
 	
 	rotate: function (e) {
-		var distanceFromX = e.clientX - a.width;
-		this.angle = (Math.PI * 2) * (distanceFromX / a.width) + Math.PI;
+		this.angle = (Math.PI * 2) * ((e.clientX - a.width) / a.width) + Math.PI;
 	},
 
 	render: function () {
@@ -58,13 +57,11 @@ var shield = {
 
 	detectCollision: function (collidable) {
 		var shieldAngles;
-		var collidableAngle;
 
 		if (!detectRadialCollision(this, collidable)) return false;
 		
 		shieldAngles = this.getAngles();
-		collidableAngle = Math.atan2(collidable.y - PLAYER_Y, collidable.x - PLAYER_X);
-		return collidableAngle >= shieldAngles.start && collidableAngle <= shieldAngles.end;
+		return Math.atan2(collidable.y - PLAYER_Y, collidable.x - PLAYER_X) >= shieldAngles.start && Math.atan2(collidable.y - PLAYER_Y, collidable.x - PLAYER_X) <= shieldAngles.end;
 	},
 
 	onHit: function (collidable) {
@@ -113,7 +110,7 @@ Particle.generateFill = function (isPlayer) {
 
 	return isPlayer 
 		? Particle.fills.player
-		: other[Math.floor(Math.random() * other.length)];
+		: other[(Math.random() * other.length)|0]; // bitshift floor
 };
 
 Particle.generatePos = function (length) {

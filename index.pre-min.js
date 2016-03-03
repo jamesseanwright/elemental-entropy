@@ -101,8 +101,8 @@ Particle.instances = [];
 Particle.lastGeneration = 0;
 
 Particle.fills = {
-	player: 'blue',
-	other: ['orange', '#008080']
+	player: '#00f',
+	other: ['#f60', '#088']
 };
 
 Particle.generateFill = function (isPlayer) {

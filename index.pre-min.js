@@ -98,7 +98,7 @@ Particle.BLUR = 100;
 Particle.GEN_DEDUCTION_MS = 100;
 
 Particle.instances = [];
-Particle.lastGeneration = Date.now() - Particle.GENERATION_FREQUENCY_MS;
+Particle.lastGeneration = 0;
 
 Particle.fills = {
 	player: 'blue',
@@ -121,9 +121,9 @@ Particle.create = function (options) {
 	Particle.instances.push(new Particle(options));
 };
 
-Particle.next = function () {
+Particle.next = function (ts) {
 	Particle.cleanup();
-	Particle.tryGenerate();
+	Particle.tryGenerate(ts);
 
 	for (var i in Particle.instances) {
 		var particle = Particle.instances[i];
@@ -144,15 +144,12 @@ Particle.cleanup = function () {
 	});
 };
 
-Particle.tryGenerate = function () {
-	var now = Date.now();
-	var frequency = Particle.GENERATION_FREQUENCY_MS - (Particle.GEN_DEDUCTION_MS * level);
-
-	var shouldGenerate = now - Particle.lastGeneration >= frequency;
+Particle.tryGenerate = function (ts) {
+	var shouldGenerate = ts - Particle.lastGeneration >= Particle.GENERATION_FREQUENCY_MS - (Particle.GEN_DEDUCTION_MS * level);
 
 	if (shouldGenerate) {
 		Particle.create();
-		Particle.lastGeneration = now;
+		Particle.lastGeneration = ts;
 	}
 };
 
@@ -266,11 +263,11 @@ var gameOver = function() {
 	isGameActive = false;
 }
 
-var loop = function() {
+var loop = function(ts) {
 	c.fillStyle = 'black';
 	c.fillRect(0, 0, a.width, a.height);
 
-	Particle.next();
+	Particle.next(ts);
 	shield.render();
 	renderHUD();
 

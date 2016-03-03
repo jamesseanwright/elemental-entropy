@@ -277,7 +277,7 @@ var loop = function(ts) {
 var renderHUD = function() {
 	c.fillStyle = '#fff';
 	c.font = '26px Arial';
-	c.fillText(score + ' - lvl ' + level, 20, 40);
+	c.fillText(score, 20, 40);
 
 	if (!isGameActive) c.fillText('GAME OVER', PLAYER_X - 80, PLAYER_Y);
 }

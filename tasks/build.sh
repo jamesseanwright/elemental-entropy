@@ -5,7 +5,7 @@ header_end_line=124
 footer_start_line=125
 html_length=154
 html_file=index.html
-script=index.js
+script=index.pre-min.js
 min_script=index.min.js
 regpack_script=index.regpack.js
 

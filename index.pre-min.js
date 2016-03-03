@@ -42,7 +42,7 @@ var shield = {
 	render: function () {
 		var angles = this.getAngles();
 
-		c.strokeStyle = 'white';
+		c.strokeStyle = '#fff';
 		c.beginPath();
 		c.arc(this.x, this.y, this.radius, angles.start, angles.end);
 		c.stroke();
@@ -264,7 +264,7 @@ var gameOver = function() {
 }
 
 var loop = function(ts) {
-	c.fillStyle = 'black';
+	c.fillStyle = '#000';
 	c.fillRect(0, 0, a.width, a.height);
 
 	Particle.next(ts);
@@ -275,7 +275,7 @@ var loop = function(ts) {
 }
 
 var renderHUD = function() {
-	c.fillStyle = 'white';
+	c.fillStyle = '#fff';
 	c.font = '26px Arial';
 	c.fillText(score + ' - lvl ' + level, 20, 40);
 

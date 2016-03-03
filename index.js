@@ -243,7 +243,7 @@ var collider = {
 
 		for (var i in this.targets) {
 			var target = this.targets[i];
-			var isHit = target.detectCollision(collidable)
+			var isHit = target.detectCollision(collidable);
 
 			if (isHit && target.onHit) target.onHit(collidable);
 		}

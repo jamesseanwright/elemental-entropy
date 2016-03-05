@@ -16,14 +16,7 @@ var ctx = new AudioContext();
 var score = 0;
 var level = 0;
 var isGameActive = true;
-
-var shield = {
-	x: 400,
-	y: 240,
-	angle: 0,
-	radius: 75,
-	isTarget: true
-};
+var angle = 0;
 
 var particles = [];
 var lastGeneration = 0;
@@ -65,7 +58,7 @@ var createParticle = function (options) {
 };
 
 a.onmousemove = function (e) {
-	if (e.clientX > 100 && e.clientX < 700) shield.angle = (Math.PI * 2) * ((e.clientX - 800) / 800) + Math.PI;
+	if (e.clientX > 100 && e.clientX < 700) angle = (Math.PI * 2) * ((e.clientX - 800) / 800) + Math.PI;
 };
 
 var player = createParticle({
@@ -122,7 +115,7 @@ var loop = function (ts) {
 			}
 
 			// collider.detect (shield)
-			if (isGameActive && !particles[i].isReversing && (Math.sqrt((shield.x - particles[i].x) * (shield.x - particles[i].x) + (shield.y - particles[i].y) * (shield.y - particles[i].y)) < shield.radius + particles[i].radius) && (Math.atan2(particles[i].y - (240), particles[i].x - (800 / 2)) >= (shield.angle - Math.PI / 4) && Math.atan2(particles[i].y - (240), particles[i].x - (800 / 2)) <= (shield.angle + Math.PI / 4))) {
+			if (isGameActive && !particles[i].isReversing && (Math.sqrt((400 - particles[i].x) * (400 - particles[i].x) + (240 - particles[i].y) * (240 - particles[i].y)) < 75 + particles[i].radius) && (Math.atan2(particles[i].y - (240), particles[i].x - (800 / 2)) >= (angle - Math.PI / 4) && Math.atan2(particles[i].y - (240), particles[i].x - (800 / 2)) <= (angle + Math.PI / 4))) {
 				particles[i].isReversing = true;
 				particles[i].xSpeed = particles[i].xSpeed * -1; // much easier than Math.abs and -() :D
 				particles[i].ySpeed = particles[i].ySpeed * -1;
@@ -142,7 +135,7 @@ var loop = function (ts) {
 	// shield.render()
 	c.strokeStyle = '#fff';
 	c.beginPath();
-	c.arc(shield.x, shield.y, shield.radius, (shield.angle - Math.PI / 4), (shield.angle + Math.PI / 4));
+	c.arc(400, 240, 75, (angle - Math.PI / 4), (angle + Math.PI / 4));
 	c.stroke();
 
 	c.fillStyle = '#fff';

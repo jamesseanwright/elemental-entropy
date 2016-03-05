@@ -20,20 +20,7 @@ var shield = {
 	y: 240,
 	angle: 0,
 	radius: 75,
-	isTarget: true,
-	
-	detectCollision: function (collidable) {
-		return detectRadialCollision(this, collidable) && (Math.atan2(collidable.y - (240), collidable.x - (800 / 2)) >= (this.angle - Math.PI / 4) && Math.atan2(collidable.y - (240), collidable.x - (800 / 2)) <= (this.angle + Math.PI / 4));
-	},
-
-	onHit: function (collidable) {
-		collidable.isReversing = true;
-		collidable.xSpeed = collidable.xSpeed * -1; // much easier than Math.abs and -() :D
-		collidable.ySpeed = collidable.ySpeed * -1;
-
-		score += 10;
-		if (score % 100 === 0) level++;
-	}
+	isTarget: true
 };
 
 var particles = [];
@@ -43,15 +30,13 @@ var fills = {
 	other: ['#f60', '#088']
 };
 
-var collisionTargets = [];
-
 var createParticle = function (options) {
 	options = options || {};
 
-	var isRandomX = !(Math.random() + 0.5|0);
+	var isRandomX = !(Math.random() + 0.5 | 0);
 	var radius = options.radius || 25;
-	var x = options.x || (isRandomX ? Math.random() * 800 : (!(Math.random() + 0.5|0) ? 0 - radius : 800 + radius));
-	var y = options.y || (isRandomX ? (!(Math.random() + 0.5|0) ? 0 - radius : 480 + radius) : (!(Math.random() + 0.5|0) ? (480 / 6) - Math.random() * (480 / 6) : 480 - ((480 / 6) - Math.random() * (480 / 6))));
+	var x = options.x || (isRandomX ? Math.random() * 800 : (!(Math.random() + 0.5 | 0) ? 0 - radius : 800 + radius));
+	var y = options.y || (isRandomX ? (!(Math.random() + 0.5 | 0) ? 0 - radius : 480 + radius) : (!(Math.random() + 0.5 | 0) ? (480 / 6) - Math.random() * (480 / 6) : 480 - ((480 / 6) - Math.random() * (480 / 6))));
 	var xSpeed = 5 * (((400) - x) / (400));
 	var ySpeed = (5 * (((240) - y) / (240))) * (240 / 400);
 
@@ -63,54 +48,45 @@ var createParticle = function (options) {
 		xSpeed: options.isPlayer ? 0 : xSpeed,
 		ySpeed: options.isPlayer ? 0 : ySpeed,
 		radius: radius,
-		fill: options.isPlayer ? fills.player : fills.other[(Math.random() * fills.other.length)|0], // bitshift floor
+		fill: options.isPlayer ? fills.player : fills.other[(Math.random() * fills.other.length) | 0], // bitshift floor
 		onHit: options.onHit,
 		detectCollision: options.detectCollision,
-        
+
 		detectCleanup: function () {
 			return this.x > 800 + this.radius + 1
-								|| this.x < 0 - (this.radius + 1)
-								|| this.y > 480 + this.radius + 1
-								|| this.y < 0 - (this.radius + 1);
+				|| this.x < 0 - (this.radius + 1)
+				|| this.y > 480 + this.radius + 1
+				|| this.y < 0 - (this.radius + 1);
 		}
 	};
 
-	if (options.isPlayer) collisionTargets.push(particle);
 	particles.push(particle);
+    return particle;
 };
 
 a.onmousemove = function (e) {
 	if (e.clientX > 100 && e.clientX < 700) shield.angle = (Math.PI * 2) * ((e.clientX - 800) / 800) + Math.PI;
 };
 
-collisionTargets.push(shield);
-
-createParticle({
+var player = createParticle({
 	isPlayer: true,
 	radius: 45,
 	x: 400,
-	y: 240,
-	onHit: function () {
-		this.cleanup = true;
-		isGameActive = false;
-	},
-	detectCollision: function (collidable) {
-		return detectRadialCollision(this, collidable);
-	}
+	y: 240
 });
 
-var detectRadialCollision = function (p1, p2) {	
+var detectRadialCollision = function (p1, p2) {
 	return Math.sqrt((p1.x - p2.x) * (p1.x - p2.x) + (p1.y - p2.y) * (p1.y - p2.y)) < p1.radius + p2.radius;
-}
+};
 
 loop();
 
-var loop = function(ts) {
+var loop = function (ts) {
 	c.fillStyle = '#000';
 	c.fillRect(0, 0, 800, 480);
 
 	// Particle.next
-	particles = particles.filter(function (p) { 
+	particles = particles.filter(function (p) {
 		return !p.cleanup;
 	});
 
@@ -132,15 +108,23 @@ var loop = function(ts) {
 			// Particle.prototype.move
             particles[i].x += particles[i].xSpeed;
 			particles[i].y += particles[i].ySpeed;
-            
+
 			particles[i].cleanup = particles[i].detectCleanup();
-		}
+			
+			//collider.detect (Particle)
+			if (detectRadialCollision(player, particles[i])) {
+				player.cleanup = true;
+				isGameActive = false;
+			}
 
-		// collider.detect
-		if (!particles[i].isTarget && !particles[i].isReversing && isGameActive) {
+			// collider.detect (shield)
+			if (isGameActive && !particles[i].isReversing && detectRadialCollision(shield, particles[i]) && (Math.atan2(particles[i].y - (240), particles[i].x - (800 / 2)) >= (shield.angle - Math.PI / 4) && Math.atan2(particles[i].y - (240), particles[i].x - (800 / 2)) <= (shield.angle + Math.PI / 4))) {
+				particles[i].isReversing = true;
+				particles[i].xSpeed = particles[i].xSpeed * -1; // much easier than Math.abs and -() :D
+				particles[i].ySpeed = particles[i].ySpeed * -1;
 
-			for (var j in collisionTargets) {
-				!collisionTargets[j].cleanup && collisionTargets[j].detectCollision(particles[i]) && collisionTargets[j].onHit(particles[i]);
+				score += 10;
+				if (score % 100 === 0) level++;
 			}
 		}
 	}
@@ -150,7 +134,7 @@ var loop = function(ts) {
 	c.beginPath();
 	c.arc(shield.x, shield.y, shield.radius, (shield.angle - Math.PI / 4), (shield.angle + Math.PI / 4));
 	c.stroke();
-	
+
 	c.fillStyle = '#fff';
 	c.font = '26px Arial';
 	c.fillText(score, 20, 40);

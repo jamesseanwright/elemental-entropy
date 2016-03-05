@@ -17,10 +17,10 @@ var isGameActive = true;
 
 var shield = {
 	init: function () {
-		this.x = 800 / 2;
-		this.y = 480 / 2;
+		this.x = 400;
+		this.y = 240;
 		this.angle = 0;
-		this.radius = 45 + 30;
+		this.radius = 75;
 
 		a.onmousemove = function (e) {
 			// hax for RegPack :(
@@ -47,7 +47,7 @@ var shield = {
 	},
 
 	detectCollision: function (collidable) {
-		return detectRadialCollision(this, collidable) && (Math.atan2(collidable.y - (480 / 2), collidable.x - (800 / 2)) >= this.getAngles().s && Math.atan2(collidable.y - (480 / 2), collidable.x - (800 / 2)) <= this.getAngles().e);
+		return detectRadialCollision(this, collidable) && (Math.atan2(collidable.y - (240), collidable.x - (800 / 2)) >= this.getAngles().s && Math.atan2(collidable.y - (240), collidable.x - (800 / 2)) <= this.getAngles().e);
 	},
 
 	onHit: function (collidable) {
@@ -62,7 +62,7 @@ var shield = {
 var Particle = function(options) {
 	options = options || {};
 	this.isPlayer = options.isPlayer;
-	this.radius = options.radius || Particle.RADIUS;
+	this.radius = options.radius || 25;
 	this.fill = Particle.generateFill(this.isPlayer);
 	this.onHit = options.onHit;
 	this.detectCollision = options.detectCollision;
@@ -72,12 +72,6 @@ var Particle = function(options) {
 
 	if (this.isPlayer) collider.addTarget.call(collider, this); // l33t h4x for Closure Compiler
 }
-
-Particle.SPEED = 5;
-Particle.RADIUS = 25;
-Particle.GENERATION_FREQUENCY_MS = 1500;
-Particle.BLUR = 100;
-Particle.GEN_DEDUCTION_MS = 100;
 
 Particle.instances = [];
 Particle.lastGeneration = 0;
@@ -124,7 +118,7 @@ Particle.cleanup = function () {
 };
 
 Particle.tryGenerate = function (ts) {
-	if (ts - Particle.lastGeneration >= Particle.GENERATION_FREQUENCY_MS - (Particle.GEN_DEDUCTION_MS * level)) {
+	if (ts - Particle.lastGeneration >= 1500 - (100 * level)) {
 		Particle.create();
 		Particle.lastGeneration = ts;
 	}
@@ -133,15 +127,15 @@ Particle.tryGenerate = function (ts) {
 Particle.prototype.render = function () {
 	c.fillStyle = this.fill;
 	c.shadowColor = this.fill;
-	c.shadowBlur = Particle.BLUR;
+	c.shadowBlur = 100;
 	c.beginPath();
 	c.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
 	c.fill();
 };
 
 Particle.prototype.setSpeed = function () {
-	this.xSpeed = Particle.SPEED * (((800 / 2) - this.x) / (800 / 2));
-	this.ySpeed = (Particle.SPEED * (((480 / 2) - this.y) / (480 / 2))) * 480 / 800;
+	this.xSpeed = 5 * (((400) - this.x) / (400));
+	this.ySpeed = (5 * (((240) - this.y) / (240))) * 480 / 800;
 };
 
 Particle.prototype.setPos = function (options) {
@@ -208,8 +202,8 @@ collider.addTarget.call(collider, shield);
 Particle.create({
 	isPlayer: true,
 	radius: 45,
-	x: (800 / 2),
-	y: (480 / 2),
+	x: (400),
+	y: (240),
 	onHit: gameOver,
 	detectCollision: function (collidable) {
 		return detectRadialCollision(this, collidable);
@@ -250,5 +244,5 @@ var renderHUD = function() {
 	c.font = '26px Arial';
 	c.fillText(score, 20, 40);
 
-	if (!isGameActive) c.fillText('BOOM', (800 / 2) - 40, (480 / 2));
+	if (!isGameActive) c.fillText('BOOM', 360, 240);
 }

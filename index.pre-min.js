@@ -77,14 +77,6 @@ var player = createParticle({
 	y: 240
 });
 
-var oscillate = function(freq, duration) {
-	var oscillator = ctx.createOscillator();
-	oscillator.frequency.value = freq;
-	oscillator.connect(ctx.destination);
-	oscillator.start(ctx.currentTime);
-	oscillator.stop(ctx.currentTime + duration);
-};
-
 loop();
 
 var loop = function (ts) {
@@ -111,6 +103,8 @@ var loop = function (ts) {
         c.fill();
 
 		if (!particles[i].isTarget) {
+			var oscillator;
+			
 			// Particle.prototype.move
             particles[i].x += particles[i].xSpeed;
 			particles[i].y += particles[i].ySpeed;
@@ -121,7 +115,12 @@ var loop = function (ts) {
 			if (isGameActive && (Math.sqrt((player.x - particles[i].x) * (player.x - particles[i].x) + (player.y - particles[i].y) * (player.y - particles[i].y)) < player.radius + particles[i].radius)) {
 				player.cleanup = true;
 				isGameActive = false;
-				oscillate(150, 2);				
+				
+				oscillator = ctx.createOscillator();
+				oscillator.frequency.value = 150;
+				oscillator.connect(ctx.destination);
+				oscillator.start(ctx.currentTime);
+				oscillator.stop(ctx.currentTime + 2);			
 			}
 
 			// collider.detect (shield)
@@ -133,7 +132,11 @@ var loop = function (ts) {
 				score += 10;
 				if (score % 100 === 0) level++;
 				
-				oscillate(190, 0.1);
+				oscillator = ctx.createOscillator();
+				oscillator.frequency.value = 190;
+				oscillator.connect(ctx.destination);
+				oscillator.start(ctx.currentTime);
+				oscillator.stop(ctx.currentTime + 0.1);
 			}
 		}
 	}

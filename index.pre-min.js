@@ -11,6 +11,9 @@
  * - c - a's 2D context
  * - g - a's 3D context */
 
+var ctx = new AudioContext();
+
+
 var score = 0;
 var level = 0;
 var isGameActive = true;
@@ -79,6 +82,14 @@ var detectRadialCollision = function (p1, p2) {
 	return Math.sqrt((p1.x - p2.x) * (p1.x - p2.x) + (p1.y - p2.y) * (p1.y - p2.y)) < p1.radius + p2.radius;
 };
 
+var oscillate = function(freq, duration) {
+	var oscillator = ctx.createOscillator();
+	oscillator.frequency.value = freq;
+	oscillator.connect(ctx.destination);
+	oscillator.start(ctx.currentTime);
+	oscillator.stop(ctx.currentTime + duration);
+};
+
 loop();
 
 var loop = function (ts) {
@@ -112,9 +123,10 @@ var loop = function (ts) {
 			particles[i].cleanup = particles[i].detectCleanup();
 			
 			//collider.detect (Particle)
-			if (detectRadialCollision(player, particles[i])) {
+			if (isGameActive && detectRadialCollision(player, particles[i])) {
 				player.cleanup = true;
 				isGameActive = false;
+				oscillate(150, 2);				
 			}
 
 			// collider.detect (shield)
@@ -125,6 +137,8 @@ var loop = function (ts) {
 
 				score += 10;
 				if (score % 100 === 0) level++;
+				
+				oscillate(190, 0.1);
 			}
 		}
 	}
@@ -142,4 +156,4 @@ var loop = function (ts) {
 	if (!isGameActive) c.fillText('BOOM', 360, 240);
 
 	requestAnimationFrame(loop);
-}
+};

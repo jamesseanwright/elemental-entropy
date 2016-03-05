@@ -40,11 +40,9 @@ var shield = {
 	},
 
 	render: function () {
-		var angles = this.getAngles();
-
 		c.strokeStyle = '#fff';
 		c.beginPath();
-		c.arc(this.x, this.y, this.radius, angles.s, angles.e);
+		c.arc(this.x, this.y, this.radius, this.getAngles().s, this.getAngles().e);
 		c.stroke();
 	},
 
@@ -60,13 +58,9 @@ var shield = {
 	},
 
 	onHit: function (collidable) {
-		var xSpeed = collidable.xSpeed;
-		var ySpeed = collidable.ySpeed;
-
 		collidable.isReversing = true;
-
-		collidable.xSpeed = xSpeed * -1; // much easier than Math.abs and -() :D
-		collidable.ySpeed = ySpeed * -1;
+		collidable.xSpeed = collidable.xSpeed * -1; // much easier than Math.abs and -() :D
+		collidable.ySpeed = collidable.ySpeed * -1;
 
 		onScore();
 	}
@@ -101,11 +95,9 @@ Particle.fills = {
 };
 
 Particle.generateFill = function (isPlayer) {
-	var other = Particle.fills.other;
-
 	return isPlayer 
 		? Particle.fills.player
-		: other[(Math.random() * other.length)|0]; // bitshift floor
+		: Particle.fills.other[(Math.random() * Particle.fills.other.length)|0]; // bitshift floor
 };
 
 Particle.generatePos = function (length) {
@@ -120,16 +112,15 @@ Particle.next = function (ts) {
 	Particle.cleanup();
 	Particle.tryGenerate(ts);
 
-	for (var j in Particle.instances) {
-		var particle = Particle.instances[j];
-		particle.render();
+	for (var i in Particle.instances) {
+		Particle.instances[i].render();
 
-		if (!particle.isTarget) {
-			particle.move();
-			particle.cleanup = particle.detectCleanup();
+		if (!Particle.instances[i].isTarget) {
+			Particle.instances[i].move();
+			Particle.instances[i].cleanup = Particle.instances[i].detectCleanup();
 		}
 
-		collider.detect(particle);
+		collider.detect(Particle.instances[i]);
 	}
 };
 
@@ -140,9 +131,7 @@ Particle.cleanup = function () {
 };
 
 Particle.tryGenerate = function (ts) {
-	var shouldGenerate = ts - Particle.lastGeneration >= Particle.GENERATION_FREQUENCY_MS - (Particle.GEN_DEDUCTION_MS * level);
-
-	if (shouldGenerate) {
+	if (ts - Particle.lastGeneration >= Particle.GENERATION_FREQUENCY_MS - (Particle.GEN_DEDUCTION_MS * level)) {
 		Particle.create();
 		Particle.lastGeneration = ts;
 	}
@@ -163,9 +152,7 @@ Particle.prototype.setSpeed = function () {
 };
 
 Particle.prototype.setPos = function (options) {
-	var hasCustomPos = options.x && options.y;
-
-	if (hasCustomPos) {
+	if (options.x && options.y) {
 		this.x = options.x;
 		this.y = options.y;
 		return;
@@ -177,11 +164,7 @@ Particle.prototype.setPos = function (options) {
 		return;
 	} 
 
-	// nasty hack to overcome shield dead spot bug :(
-	var preCentre = !(Math.random() + 0.5|0);
-	var start = (a.height / 6) - Math.random() * (a.height / 6);
-
-	this.y = preCentre ? start : a.height - start;
+	this.y = !(Math.random() + 0.5|0) ? (a.height / 6) - Math.random() * (a.height / 6) : a.height - ((a.height / 6) - Math.random() * (a.height / 6));
 	this.x = this.getStartPos(a.width);
 };
 

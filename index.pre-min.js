@@ -51,8 +51,6 @@ var createParticle = function (options) {
 		ySpeed: options.isPlayer ? 0 : ySpeed,
 		radius: radius,
 		fill: options.isPlayer ? fills.player : fills.other[(Math.random() * fills.other.length) | 0], // bitshift floor
-		onHit: options.onHit,
-		detectCollision: options.detectCollision,
 
 		detectCleanup: function () {
 			return this.x > 800 + this.radius + 1

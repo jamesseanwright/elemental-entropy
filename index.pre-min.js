@@ -13,7 +13,6 @@
 
 var ctx = new AudioContext();
 
-
 var score = 0;
 var level = 0;
 var isGameActive = true;
@@ -78,10 +77,6 @@ var player = createParticle({
 	y: 240
 });
 
-var detectRadialCollision = function (p1, p2) {
-	return Math.sqrt((p1.x - p2.x) * (p1.x - p2.x) + (p1.y - p2.y) * (p1.y - p2.y)) < p1.radius + p2.radius;
-};
-
 var oscillate = function(freq, duration) {
 	var oscillator = ctx.createOscillator();
 	oscillator.frequency.value = freq;
@@ -123,14 +118,14 @@ var loop = function (ts) {
 			particles[i].cleanup = particles[i].detectCleanup();
 			
 			//collider.detect (Particle)
-			if (isGameActive && detectRadialCollision(player, particles[i])) {
+			if (isGameActive && (Math.sqrt((player.x - particles[i].x) * (player.x - particles[i].x) + (player.y - particles[i].y) * (player.y - particles[i].y)) < player.radius + particles[i].radius)) {
 				player.cleanup = true;
 				isGameActive = false;
 				oscillate(150, 2);				
 			}
 
 			// collider.detect (shield)
-			if (isGameActive && !particles[i].isReversing && detectRadialCollision(shield, particles[i]) && (Math.atan2(particles[i].y - (240), particles[i].x - (800 / 2)) >= (shield.angle - Math.PI / 4) && Math.atan2(particles[i].y - (240), particles[i].x - (800 / 2)) <= (shield.angle + Math.PI / 4))) {
+			if (isGameActive && !particles[i].isReversing && (Math.sqrt((shield.x - particles[i].x) * (shield.x - particles[i].x) + (shield.y - particles[i].y) * (shield.y - particles[i].y)) < shield.radius + particles[i].radius) && (Math.atan2(particles[i].y - (240), particles[i].x - (800 / 2)) >= (shield.angle - Math.PI / 4) && Math.atan2(particles[i].y - (240), particles[i].x - (800 / 2)) <= (shield.angle + Math.PI / 4))) {
 				particles[i].isReversing = true;
 				particles[i].xSpeed = particles[i].xSpeed * -1; // much easier than Math.abs and -() :D
 				particles[i].ySpeed = particles[i].ySpeed * -1;

@@ -60,17 +60,11 @@ var player = createParticle({
 	y: 240
 });
 
-loop();
-
 var loop = function (ts) {
 	c.fillStyle = '#000';
 	c.fillRect(0, 0, 800, 480);
 
 	// Particle.next
-	particles = particles.filter(function (p) {
-		return !p.cleanup;
-	});
-
 	if (ts - lastGeneration >= 1500 - (100 * level)) {
 		createParticle();
 		lastGeneration = ts;
@@ -78,50 +72,52 @@ var loop = function (ts) {
 
 	for (var i in particles) {
         // Particle.prototype.render
-        c.fillStyle = particles[i].fill;
-        c.shadowColor = particles[i].fill;
-        c.shadowBlur = 100;
-        c.beginPath();
-        c.arc(particles[i].x, particles[i].y, particles[i].radius, 0, Math.PI * 2);
-        c.fill();
+		if (particles[i]) {
+			c.fillStyle = particles[i].fill;
+			c.shadowColor = particles[i].fill;
+			c.shadowBlur = 100;
+			c.beginPath();
+			c.arc(particles[i].x, particles[i].y, particles[i].radius, 0, Math.PI * 2);
+			c.fill();
 
-		if (particles[i] !== player) {
-			var oscillator;
-			
-			// Particle.prototype.move
-            particles[i].x += particles[i].xSpeed;
-			particles[i].y += particles[i].ySpeed;
-	
-			//collider.detect (Particle)
-			if (isGameActive && (Math.sqrt((player.x - particles[i].x) * (player.x - particles[i].x) + (player.y - particles[i].y) * (player.y - particles[i].y)) < player.radius + particles[i].radius)) {
-				player.cleanup = true;
-				isGameActive = false;
+			if (particles[i] !== player) {
+				var oscillator;
 				
-				oscillator = ctx.createOscillator();
-				oscillator.frequency.value = 150;
-				oscillator.connect(ctx.destination);
-				oscillator.start(ctx.currentTime);
-				oscillator.stop(ctx.currentTime + 2);			
-			}
+				// Particle.prototype.move
+				particles[i].x += particles[i].xSpeed;
+				particles[i].y += particles[i].ySpeed;
+		
+				//collider.detect (Particle)
+				if (isGameActive && (Math.sqrt((player.x - particles[i].x) * (player.x - particles[i].x) + (player.y - particles[i].y) * (player.y - particles[i].y)) < player.radius + particles[i].radius)) {
+					player.cleanup = true;
+					isGameActive = false;
+					
+					oscillator = ctx.createOscillator();
+					oscillator.frequency.value = 150;
+					oscillator.connect(ctx.destination);
+					oscillator.start(ctx.currentTime);
+					oscillator.stop(ctx.currentTime + 2);			
+				}
 
-			// collider.detect (shield)
-			if (isGameActive && !particles[i].isReversing && (Math.sqrt((400 - particles[i].x) * (400 - particles[i].x) + (240 - particles[i].y) * (240 - particles[i].y)) < 75 + particles[i].radius) && (Math.atan2(particles[i].y - (240), particles[i].x - (800 / 2)) >= (angle - Math.PI / 4) && Math.atan2(particles[i].y - (240), particles[i].x - (800 / 2)) <= (angle + Math.PI / 4))) {
-				particles[i].isReversing = true;
-				particles[i].xSpeed = particles[i].xSpeed * -1; // much easier than Math.abs and -() :D
-				particles[i].ySpeed = particles[i].ySpeed * -1;
+				// collider.detect (shield)
+				if (isGameActive && !particles[i].isReversing && (Math.sqrt((400 - particles[i].x) * (400 - particles[i].x) + (240 - particles[i].y) * (240 - particles[i].y)) < 75 + particles[i].radius) && (Math.atan2(particles[i].y - (240), particles[i].x - (800 / 2)) >= (angle - Math.PI / 4) && Math.atan2(particles[i].y - (240), particles[i].x - (800 / 2)) <= (angle + Math.PI / 4))) {
+					particles[i].isReversing = true;
+					particles[i].xSpeed = particles[i].xSpeed * -1; // much easier than Math.abs and -() :D
+					particles[i].ySpeed = particles[i].ySpeed * -1;
 
-				score += 10;
-				if (score % 100 === 0) level++;
+					score += 10;
+					if (score % 100 === 0) level++;
+					
+					oscillator = ctx.createOscillator();
+					oscillator.frequency.value = 190;
+					oscillator.connect(ctx.destination);
+					oscillator.start(ctx.currentTime);
+					oscillator.stop(ctx.currentTime + 0.1);
+				}
 				
-				oscillator = ctx.createOscillator();
-				oscillator.frequency.value = 190;
-				oscillator.connect(ctx.destination);
-				oscillator.start(ctx.currentTime);
-				oscillator.stop(ctx.currentTime + 0.1);
-			}
-			
-			if (particles[i].x > 800 + particles[i].radius + 1 || particles[i].x < 0 - (particles[i].radius + 1) || particles[i].y > 480 + particles[i].radius + 1 || particles[i].y < 0 - (particles[i].radius + 1)) {
-				particles[i] = undefined;
+				if (particles[i].x > 800 + particles[i].radius + 1 || particles[i].x < 0 - (particles[i].radius + 1) || particles[i].y > 480 + particles[i].radius + 1 || particles[i].y < 0 - (particles[i].radius + 1)) {
+					particles[i] = undefined;
+				}
 			}
 		}
 	}
@@ -140,3 +136,5 @@ var loop = function (ts) {
 
 	requestAnimationFrame(loop);
 };
+
+loop();

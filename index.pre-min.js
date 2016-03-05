@@ -102,7 +102,6 @@ a.onmousemove = function (e) {
 	(e.x > 100 && e.x < 700) && shield.r(e);
 };
 
-// Closure Compiler hax
 collisionTargets.push(shield);
 
 createParticle({

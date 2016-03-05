@@ -23,18 +23,11 @@ var shield = {
 	isTarget: true,
 	
 	r: function (e) {
-		this.angle = (Math.PI * 2) * ((e.clientX - 800) / 800) + Math.PI;
-	},
-
-	getAngles: function () {
-		return {
-			s: this.angle - Math.PI / 4,
-			e: this.angle + Math.PI / 4
-		};
+		this.angle = (Math.PI * 2) * ((e.x - 800) / 800) + Math.PI;
 	},
 
 	detectCollision: function (collidable) {
-		return detectRadialCollision(this, collidable) && (Math.atan2(collidable.y - (240), collidable.x - (800 / 2)) >= this.getAngles().s && Math.atan2(collidable.y - (240), collidable.x - (800 / 2)) <= this.getAngles().e);
+		return detectRadialCollision(this, collidable) && (Math.atan2(collidable.y - (240), collidable.x - (800 / 2)) >= (this.angle - Math.PI / 4) && Math.atan2(collidable.y - (240), collidable.x - (800 / 2)) <= (this.angle + Math.PI / 4));
 	},
 
 	onHit: function (collidable) {
@@ -42,7 +35,8 @@ var shield = {
 		collidable.xSpeed = collidable.xSpeed * -1; // much easier than Math.abs and -() :D
 		collidable.ySpeed = collidable.ySpeed * -1;
 
-		onScore();
+		score += 10;
+		if (score % 100 === 0) level++;
 	}
 };
 
@@ -105,7 +99,7 @@ var createParticle = function (options) {
 
 a.onmousemove = function (e) {
 	// hax for RegPack :(
-	(e.clientX > 100 && e.clientX < 700) && shield.r(e);
+	(e.x > 100 && e.x < 700) && shield.r(e);
 };
 
 // Closure Compiler hax
@@ -127,12 +121,6 @@ createParticle({
 
 var detectRadialCollision = function (p1, p2) {	
 	return Math.sqrt((p1.x - p2.x) * (p1.x - p2.x) + (p1.y - p2.y) * (p1.y - p2.y)) < p1.radius + p2.radius;
-}
-
-var onScore = function() {
-	score += 10;
-
-	if (score % 100 === 0) level++;
 }
 
 loop();
@@ -171,7 +159,7 @@ var loop = function(ts) {
 	// shield.render()
 	c.strokeStyle = '#fff';
 	c.beginPath();
-	c.arc(shield.x, shield.y, shield.radius, shield.getAngles().s, shield.getAngles().e);
+	c.arc(shield.x, shield.y, shield.radius, (shield.angle - Math.PI / 4), (shield.angle + Math.PI / 4));
 	c.stroke();
 	
 	c.fillStyle = '#fff';

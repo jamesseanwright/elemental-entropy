@@ -61,23 +61,12 @@ var shield = {
 
 var particles = [];
 var lastGeneration = 0;
-var Particle = {};
-Particle.fills = {
+var fills = {
 	player: '#00f',
 	other: ['#f60', '#088']
 };
 
-Particle.generateFill = function (isPlayer) {
-	return isPlayer 
-		? Particle.fills.player
-		: Particle.fills.other[(Math.random() * Particle.fills.other.length)|0]; // bitshift floor
-};
-
-Particle.generatePos = function (length) {
-	return Math.random() * length;
-};
-
-Particle.create = function (options) {
+var createParticle = function (options) {
 	options = options || {};
 
 	var isRandomX = !(Math.random() + 0.5|0);
@@ -94,7 +83,7 @@ Particle.create = function (options) {
 		xSpeed: xSpeed,
 		ySpeed: ySpeed,
 		radius: radius,
-		fill: Particle.generateFill(options.isPlayer),
+		fill: options.isPlayer ? fills.player : fills.other[(Math.random() * fills.other.length)|0], // bitshift floor
 		onHit: options.onHit,
 		detectCollision: options.detectCollision,
 
@@ -123,19 +112,6 @@ Particle.create = function (options) {
 	if (options.isPlayer) collider.addTarget.call(collider, particle); // l33t h4x for Closure Compiler
 
 	particles.push(particle);
-};
-
-Particle.cleanup = function () {
-	particles = particles.filter(function (p) { 
-		return !p.cleanup;
-	});
-};
-
-Particle.tryGenerate = function (ts) {
-	if (ts - lastGeneration >= 1500 - (100 * level)) {
-		Particle.create();
-		lastGeneration = ts;
-	}
 };
 
 var collider = {
@@ -200,8 +176,14 @@ var loop = function(ts) {
 	c.fillRect(0, 0, 800, 480);
 
 	// Particle.next
-	Particle.cleanup();
-	Particle.tryGenerate(ts);
+	particles = particles.filter(function (p) { 
+		return !p.cleanup;
+	});
+
+	if (ts - lastGeneration >= 1500 - (100 * level)) {
+		createParticle();
+		lastGeneration = ts;
+	}
 
 	for (var i in particles) {
 		particles[i].render();

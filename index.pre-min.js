@@ -16,17 +16,10 @@ var level = 0;
 var isGameActive = true;
 
 var shield = {
-	init: function () {
-		this.x = 400;
-		this.y = 240;
-		this.angle = 0;
-		this.radius = 75;
-
-		a.onmousemove = function (e) {
-			// hax for RegPack :(
-			(e.clientX > 100 && e.clientX < 700) && shield.r(e);
-		};
-	},
+	x: 400,
+	y: 240,
+	angle: 0,
+	radius: 75,
 	
 	r: function (e) {
 		this.angle = (Math.PI * 2) * ((e.clientX - 800) / 800) + Math.PI;
@@ -68,11 +61,11 @@ var fills = {
 
 var createParticle = function (options) {
 	options = options || {};
-
+	
 	var isRandomX = !(Math.random() + 0.5|0);
 	var radius = options.radius || 25;
-	var x = options.x || isRandomX ? Math.random() * 800 : (!(Math.random() + 0.5|0) ? 0 - radius : 800 + radius);
-	var y = options.y || isRandomX ? (!(Math.random() + 0.5|0) ? 0 - radius : 480 + radius) : (!(Math.random() + 0.5|0) ? (480 / 6) - Math.random() * (480 / 6) : 480 - ((480 / 6) - Math.random() * (480 / 6)));
+	var x = options.x || (isRandomX ? Math.random() * 800 : (!(Math.random() + 0.5|0) ? 0 - radius : 800 + radius));
+	var y = options.y || (isRandomX ? (!(Math.random() + 0.5|0) ? 0 - radius : 480 + radius) : (!(Math.random() + 0.5|0) ? (480 / 6) - Math.random() * (480 / 6) : 480 - ((480 / 6) - Math.random() * (480 / 6))));
 	var xSpeed = 5 * (((400) - x) / (400));
 	var ySpeed = (5 * (((240) - y) / (240))) * (240 / 400);
 
@@ -80,8 +73,8 @@ var createParticle = function (options) {
 		isPlayer: options.isPlayer,
 		x: x,
 		y: y,
-		xSpeed: xSpeed,
-		ySpeed: ySpeed,
+		xSpeed: options.isPlayer ? 0 : xSpeed,
+		ySpeed: options.isPlayer ? 0 : ySpeed,
 		radius: radius,
 		fill: options.isPlayer ? fills.player : fills.other[(Math.random() * fills.other.length)|0], // bitshift floor
 		onHit: options.onHit,
@@ -137,16 +130,19 @@ var collider = {
 	}
 };
 
-shield.init();
+a.onmousemove = function (e) {
+	// hax for RegPack :(
+	(e.clientX > 100 && e.clientX < 700) && shield.r(e);
+};
 
 // Closure Compiler hax
 collider.addTarget.call(collider, shield);
 
-Particle.create({
+createParticle({
 	isPlayer: true,
 	radius: 45,
-	x: (400),
-	y: (240),
+	x: 400,
+	y: 240,
 	onHit: gameOver,
 	detectCollision: function (collidable) {
 		return detectRadialCollision(this, collidable);

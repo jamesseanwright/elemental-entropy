@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 script=index.pre-min.js
-out_script=index.pre-crunch.js
+out_script=index.pre-crush.js
 regpack_script=index.regpack.js
 
 echo "Minifying with Closure Compiler..."

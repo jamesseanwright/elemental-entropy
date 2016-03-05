@@ -59,11 +59,9 @@ var shield = {
 	}
 };
 
+var particles = [];
+var lastGeneration = 0;
 var Particle = {};
-
-Particle.instances = [];
-Particle.lastGeneration = 0;
-
 Particle.fills = {
 	player: '#00f',
 	other: ['#f60', '#088']
@@ -124,37 +122,19 @@ Particle.create = function (options) {
 
 	if (options.isPlayer) collider.addTarget.call(collider, particle); // l33t h4x for Closure Compiler
 
-	Particle.instances.push(particle);
-	console.log(particle);
-
-};
-
-Particle.next = function (ts) {
-	Particle.cleanup();
-	Particle.tryGenerate(ts);
-
-	for (var i in Particle.instances) {
-		Particle.instances[i].render();
-
-		if (!Particle.instances[i].isTarget) {
-			Particle.instances[i].m();
-			Particle.instances[i].cleanup = Particle.instances[i].detectCleanup();
-		}
-
-		collider.detect(Particle.instances[i]);
-	}
+	particles.push(particle);
 };
 
 Particle.cleanup = function () {
-	Particle.instances = Particle.instances.filter(function (p) { 
+	particles = particles.filter(function (p) { 
 		return !p.cleanup;
 	});
 };
 
 Particle.tryGenerate = function (ts) {
-	if (ts - Particle.lastGeneration >= 1500 - (100 * level)) {
+	if (ts - lastGeneration >= 1500 - (100 * level)) {
 		Particle.create();
-		Particle.lastGeneration = ts;
+		lastGeneration = ts;
 	}
 };
 
@@ -219,7 +199,21 @@ var loop = function(ts) {
 	c.fillStyle = '#000';
 	c.fillRect(0, 0, 800, 480);
 
-	Particle.next(ts);
+	// Particle.next
+	Particle.cleanup();
+	Particle.tryGenerate(ts);
+
+	for (var i in particles) {
+		particles[i].render();
+
+		if (!particles[i].isTarget) {
+			particles[i].m();
+			particles[i].cleanup = particles[i].detectCleanup();
+		}
+
+		collider.detect(particles[i]);
+	}
+
 	shield.render();
 	
 	c.fillStyle = '#fff';

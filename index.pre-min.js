@@ -11,8 +11,8 @@
  * - c - a's 2D context
  * - g - a's 3D context */
 
-var PLAYER_X = a.width / 2;
-var PLAYER_Y = a.height / 2;
+var PLAYER_X = 800 / 2;
+var PLAYER_Y = 480 / 2;
 var PLAYER_RADIUS = 45;
 var LEVEL_INCREASE_THRESHOLD = 100;
 var HIT_SCORE = 10;
@@ -31,12 +31,12 @@ var shield = {
 
 		a.onmousemove = function (e) {
 			// hax for RegPack :(
-			(e.clientX > H_PADDING && e.clientX < a.width - H_PADDING) && shield.r(e);
+			(e.clientX > H_PADDING && e.clientX < 800 - H_PADDING) && shield.r(e);
 		};
 	},
 	
 	r: function (e) {
-		this.angle = (Math.PI * 2) * ((e.clientX - a.width) / a.width) + Math.PI;
+		this.angle = (Math.PI * 2) * ((e.clientX - 800) / 800) + Math.PI;
 	},
 
 	render: function () {
@@ -148,7 +148,7 @@ Particle.prototype.render = function () {
 
 Particle.prototype.setSpeed = function () {
 	this.xSpeed = Particle.SPEED * ((PLAYER_X - this.x) / PLAYER_X);
-	this.ySpeed = (Particle.SPEED * ((PLAYER_Y - this.y) / PLAYER_Y)) * a.height / a.width;
+	this.ySpeed = (Particle.SPEED * ((PLAYER_Y - this.y) / PLAYER_Y)) * 480 / 800;
 };
 
 Particle.prototype.setPos = function (options) {
@@ -159,13 +159,13 @@ Particle.prototype.setPos = function (options) {
 	}
 
 	if (!(Math.random() + 0.5|0)) {
-		this.x = Math.random() * a.width;
-		this.y = this.getStartPos(a.width);
+		this.x = Math.random() * 800;
+		this.y = this.getStartPos(800);
 		return;
 	} 
 
-	this.y = !(Math.random() + 0.5|0) ? (a.height / 6) - Math.random() * (a.height / 6) : a.height - ((a.height / 6) - Math.random() * (a.height / 6));
-	this.x = this.getStartPos(a.width);
+	this.y = !(Math.random() + 0.5|0) ? (480 / 6) - Math.random() * (480 / 6) : 480 - ((480 / 6) - Math.random() * (480 / 6));
+	this.x = this.getStartPos(800);
 };
 
 Particle.prototype.getStartPos = function (length) {
@@ -178,9 +178,9 @@ Particle.prototype.move = function () {
 };
 
 Particle.prototype.detectCleanup = function () {
-	return this.x > a.width + this.radius + 1
+	return this.x > 800 + this.radius + 1
 						|| this.x < 0 - (this.radius + 1)
-						|| this.y > a.height + this.radius + 1
+						|| this.y > 480 + this.radius + 1
 						|| this.y < 0 - (this.radius + 1);
 };
 
@@ -243,7 +243,7 @@ var gameOver = function() {
 
 var loop = function(ts) {
 	c.fillStyle = '#000';
-	c.fillRect(0, 0, a.width, a.height);
+	c.fillRect(0, 0, 800, 480);
 
 	Particle.next(ts);
 	shield.render();

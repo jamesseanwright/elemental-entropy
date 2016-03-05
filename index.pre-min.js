@@ -132,8 +132,6 @@ var loop = function (ts) {
 	c.font = '26px Arial';
 	c.fillText(score, 20, 40);
 
-	if (!isGameActive) c.fillText('BOOM', 360, 240);
-
 	requestAnimationFrame(loop);
 };
 

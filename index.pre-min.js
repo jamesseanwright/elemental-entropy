@@ -59,19 +59,7 @@ var shield = {
 	}
 };
 
-var Particle = function(options) {
-	options = options || {};
-	this.isPlayer = options.isPlayer;
-	this.radius = options.radius || 25;
-	this.fill = Particle.generateFill(this.isPlayer);
-	this.onHit = options.onHit;
-	this.detectCollision = options.detectCollision;
-
-	this.setPos(options);
-	this.setSpeed();
-
-	if (this.isPlayer) collider.addTarget.call(collider, this); // l33t h4x for Closure Compiler
-}
+var Particle = {};
 
 Particle.instances = [];
 Particle.lastGeneration = 0;
@@ -92,7 +80,53 @@ Particle.generatePos = function (length) {
 };
 
 Particle.create = function (options) {
-	Particle.instances.push(new Particle(options));
+	options = options || {};
+
+	var isRandomX = !(Math.random() + 0.5|0);
+	var radius = options.radius || 25;
+	var x = options.x || isRandomX ? Math.random() * 800 : (!(Math.random() + 0.5|0) ? 0 - radius : 800 + radius);
+	var y = options.y || isRandomX ? (!(Math.random() + 0.5|0) ? 0 - radius : 480 + radius) : (!(Math.random() + 0.5|0) ? (480 / 6) - Math.random() * (480 / 6) : 480 - ((480 / 6) - Math.random() * (480 / 6)));
+	var xSpeed = 5 * (((400) - x) / (400));
+	var ySpeed = (5 * (((240) - y) / (240))) * (240 / 400);
+
+	var particle = {
+		isPlayer: options.isPlayer,
+		x: x,
+		y: y,
+		xSpeed: xSpeed,
+		ySpeed: ySpeed,
+		radius: radius,
+		fill: Particle.generateFill(options.isPlayer),
+		onHit: options.onHit,
+		detectCollision: options.detectCollision,
+
+		render: function () {
+			c.fillStyle = this.fill;
+			c.shadowColor = this.fill;
+			c.shadowBlur = 100;
+			c.beginPath();
+			c.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+			c.fill();
+		},
+
+		m: function () {
+			this.x += this.xSpeed;
+			this.y += this.ySpeed;
+		},
+
+		detectCleanup: function () {
+			return this.x > 800 + this.radius + 1
+								|| this.x < 0 - (this.radius + 1)
+								|| this.y > 480 + this.radius + 1
+								|| this.y < 0 - (this.radius + 1);
+		}
+	};
+
+	if (options.isPlayer) collider.addTarget.call(collider, particle); // l33t h4x for Closure Compiler
+
+	Particle.instances.push(particle);
+	console.log(particle);
+
 };
 
 Particle.next = function (ts) {
@@ -122,53 +156,6 @@ Particle.tryGenerate = function (ts) {
 		Particle.create();
 		Particle.lastGeneration = ts;
 	}
-};
-
-Particle.prototype.render = function () {
-	c.fillStyle = this.fill;
-	c.shadowColor = this.fill;
-	c.shadowBlur = 100;
-	c.beginPath();
-	c.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
-	c.fill();
-};
-
-Particle.prototype.setSpeed = function () {
-	this.xSpeed = 5 * (((400) - this.x) / (400));
-	this.ySpeed = (5 * (((240) - this.y) / (240))) * 480 / 800;
-};
-
-Particle.prototype.setPos = function (options) {
-	if (options.x && options.y) {
-		this.x = options.x;
-		this.y = options.y;
-		return;
-	}
-
-	if (!(Math.random() + 0.5|0)) {
-		this.x = Math.random() * 800;
-		this.y = this.getStartPos(800);
-		return;
-	} 
-
-	this.y = !(Math.random() + 0.5|0) ? (480 / 6) - Math.random() * (480 / 6) : 480 - ((480 / 6) - Math.random() * (480 / 6));
-	this.x = this.getStartPos(800);
-};
-
-Particle.prototype.getStartPos = function (length) {
-	return !(Math.random() + 0.5|0) ? 0 - this.radius : length + this.radius;
-};
-
-Particle.prototype.m = function () {
-	this.x += this.xSpeed;
-	this.y += this.ySpeed;
-};
-
-Particle.prototype.detectCleanup = function () {
-	return this.x > 800 + this.radius + 1
-						|| this.x < 0 - (this.radius + 1)
-						|| this.y > 480 + this.radius + 1
-						|| this.y < 0 - (this.radius + 1);
 };
 
 var collider = {

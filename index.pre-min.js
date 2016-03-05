@@ -22,10 +22,6 @@ var shield = {
 	radius: 75,
 	isTarget: true,
 	
-	r: function (e) {
-		this.angle = (Math.PI * 2) * ((e.x - 800) / 800) + Math.PI;
-	},
-
 	detectCollision: function (collidable) {
 		return detectRadialCollision(this, collidable) && (Math.atan2(collidable.y - (240), collidable.x - (800 / 2)) >= (this.angle - Math.PI / 4) && Math.atan2(collidable.y - (240), collidable.x - (800 / 2)) <= (this.angle + Math.PI / 4));
 	},
@@ -98,8 +94,7 @@ var createParticle = function (options) {
 };
 
 a.onmousemove = function (e) {
-	// hax for RegPack :(
-	(e.x > 100 && e.x < 700) && shield.r(e);
+	if (e.x > 100 && e.x < 700) shield.angle = (Math.PI * 2) * ((e.x - 800) / 800) + Math.PI;
 };
 
 collisionTargets.push(shield);

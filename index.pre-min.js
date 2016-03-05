@@ -37,20 +37,12 @@ var createParticle = function (options) {
 
 	var particle = {
 		isPlayer: options.isPlayer,
-		isTarget: options.isPlayer,
 		x: x,
 		y: y,
 		xSpeed: options.isPlayer ? 0 : xSpeed,
 		ySpeed: options.isPlayer ? 0 : ySpeed,
 		radius: radius,
 		fill: options.isPlayer ? fills.player : fills.other[(Math.random() * fills.other.length) | 0], // bitshift floor
-
-		detectCleanup: function () {
-			return this.x > 800 + this.radius + 1
-				|| this.x < 0 - (this.radius + 1)
-				|| this.y > 480 + this.radius + 1
-				|| this.y < 0 - (this.radius + 1);
-		}
 	};
 
 	particles.push(particle);
@@ -93,15 +85,13 @@ var loop = function (ts) {
         c.arc(particles[i].x, particles[i].y, particles[i].radius, 0, Math.PI * 2);
         c.fill();
 
-		if (!particles[i].isTarget) {
+		if (particles[i] !== player) {
 			var oscillator;
 			
 			// Particle.prototype.move
             particles[i].x += particles[i].xSpeed;
 			particles[i].y += particles[i].ySpeed;
-
-			particles[i].cleanup = particles[i].detectCleanup();
-			
+	
 			//collider.detect (Particle)
 			if (isGameActive && (Math.sqrt((player.x - particles[i].x) * (player.x - particles[i].x) + (player.y - particles[i].y) * (player.y - particles[i].y)) < player.radius + particles[i].radius)) {
 				player.cleanup = true;
@@ -128,6 +118,10 @@ var loop = function (ts) {
 				oscillator.connect(ctx.destination);
 				oscillator.start(ctx.currentTime);
 				oscillator.stop(ctx.currentTime + 0.1);
+			}
+			
+			if (particles[i].x > 800 + particles[i].radius + 1 || particles[i].x < 0 - (particles[i].radius + 1) || particles[i].y > 480 + particles[i].radius + 1 || particles[i].y < 0 - (particles[i].radius + 1)) {
+				particles[i] = undefined;
 			}
 		}
 	}

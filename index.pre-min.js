@@ -103,7 +103,7 @@ Particle.next = function (ts) {
 		Particle.instances[i].render();
 
 		if (!Particle.instances[i].isTarget) {
-			Particle.instances[i].move();
+			Particle.instances[i].m();
 			Particle.instances[i].cleanup = Particle.instances[i].detectCleanup();
 		}
 
@@ -159,7 +159,7 @@ Particle.prototype.getStartPos = function (length) {
 	return !(Math.random() + 0.5|0) ? 0 - this.radius : length + this.radius;
 };
 
-Particle.prototype.move = function () {
+Particle.prototype.m = function () {
 	this.x += this.xSpeed;
 	this.y += this.ySpeed;
 };
@@ -234,15 +234,12 @@ var loop = function(ts) {
 
 	Particle.next(ts);
 	shield.render();
-	renderHUD();
-
-	requestAnimationFrame(loop);
-}
-
-var renderHUD = function() {
+	
 	c.fillStyle = '#fff';
 	c.font = '26px Arial';
 	c.fillText(score, 20, 40);
 
 	if (!isGameActive) c.fillText('BOOM', 360, 240);
+
+	requestAnimationFrame(loop);
 }

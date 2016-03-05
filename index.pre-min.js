@@ -66,21 +66,7 @@ var createParticle = function (options) {
 		fill: options.isPlayer ? fills.player : fills.other[(Math.random() * fills.other.length)|0], // bitshift floor
 		onHit: options.onHit,
 		detectCollision: options.detectCollision,
-
-		render: function () {
-			c.fillStyle = this.fill;
-			c.shadowColor = this.fill;
-			c.shadowBlur = 100;
-			c.beginPath();
-			c.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
-			c.fill();
-		},
-
-		m: function () {
-			this.x += this.xSpeed;
-			this.y += this.ySpeed;
-		},
-
+        
 		detectCleanup: function () {
 			return this.x > 800 + this.radius + 1
 								|| this.x < 0 - (this.radius + 1)
@@ -134,10 +120,19 @@ var loop = function(ts) {
 	}
 
 	for (var i in particles) {
-		particles[i].render();
+        // Particle.prototype.render
+        c.fillStyle = particles[i].fill;
+        c.shadowColor = particles[i].fill;
+        c.shadowBlur = 100;
+        c.beginPath();
+        c.arc(particles[i].x, particles[i].y, particles[i].radius, 0, Math.PI * 2);
+        c.fill();
 
 		if (!particles[i].isTarget) {
-			particles[i].m();
+			// Particle.prototype.move
+            particles[i].x += particles[i].xSpeed;
+			particles[i].y += particles[i].ySpeed;
+            
 			particles[i].cleanup = particles[i].detectCleanup();
 		}
 

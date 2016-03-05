@@ -44,24 +44,19 @@ var shield = {
 
 		c.strokeStyle = '#fff';
 		c.beginPath();
-		c.arc(this.x, this.y, this.radius, angles.start, angles.end);
+		c.arc(this.x, this.y, this.radius, angles.s, angles.e);
 		c.stroke();
 	},
 
 	getAngles: function () {
 		return {
-			start: this.angle - Math.PI / 4,
-			end: this.angle + Math.PI / 4
+			s: this.angle - Math.PI / 4,
+			e: this.angle + Math.PI / 4
 		};
 	},
 
 	detectCollision: function (collidable) {
-		var shieldAngles;
-
-		if (!detectRadialCollision(this, collidable)) return false;
-		
-		shieldAngles = this.getAngles();
-		return Math.atan2(collidable.y - PLAYER_Y, collidable.x - PLAYER_X) >= shieldAngles.start && Math.atan2(collidable.y - PLAYER_Y, collidable.x - PLAYER_X) <= shieldAngles.end;
+		return detectRadialCollision(this, collidable) && (Math.atan2(collidable.y - PLAYER_Y, collidable.x - PLAYER_X) >= this.getAngles().s && Math.atan2(collidable.y - PLAYER_Y, collidable.x - PLAYER_X) <= this.getAngles().e);
 	},
 
 	onHit: function (collidable) {
@@ -125,8 +120,8 @@ Particle.next = function (ts) {
 	Particle.cleanup();
 	Particle.tryGenerate(ts);
 
-	for (var i in Particle.instances) {
-		var particle = Particle.instances[i];
+	for (var j in Particle.instances) {
+		var particle = Particle.instances[j];
 		particle.render();
 
 		if (!particle.isTarget) {

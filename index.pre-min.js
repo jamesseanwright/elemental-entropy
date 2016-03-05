@@ -94,7 +94,7 @@ var createParticle = function (options) {
 };
 
 a.onmousemove = function (e) {
-	if (e.x > 100 && e.x < 700) shield.angle = (Math.PI * 2) * ((e.x - 800) / 800) + Math.PI;
+	if (e.clientX > 100 && e.clientX < 700) shield.angle = (Math.PI * 2) * ((e.clientX - 800) / 800) + Math.PI;
 };
 
 collisionTargets.push(shield);

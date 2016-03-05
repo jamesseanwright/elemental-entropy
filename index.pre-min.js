@@ -20,16 +20,10 @@ var shield = {
 	y: 240,
 	angle: 0,
 	radius: 75,
+	isTarget: true,
 	
 	r: function (e) {
 		this.angle = (Math.PI * 2) * ((e.clientX - 800) / 800) + Math.PI;
-	},
-
-	render: function () {
-		c.strokeStyle = '#fff';
-		c.beginPath();
-		c.arc(this.x, this.y, this.radius, this.getAngles().s, this.getAngles().e);
-		c.stroke();
 	},
 
 	getAngles: function () {
@@ -59,9 +53,11 @@ var fills = {
 	other: ['#f60', '#088']
 };
 
+var collisionTargets = [];
+
 var createParticle = function (options) {
 	options = options || {};
-	
+
 	var isRandomX = !(Math.random() + 0.5|0);
 	var radius = options.radius || 25;
 	var x = options.x || (isRandomX ? Math.random() * 800 : (!(Math.random() + 0.5|0) ? 0 - radius : 800 + radius));
@@ -71,6 +67,7 @@ var createParticle = function (options) {
 
 	var particle = {
 		isPlayer: options.isPlayer,
+		isTarget: options.isPlayer,
 		x: x,
 		y: y,
 		xSpeed: options.isPlayer ? 0 : xSpeed,
@@ -102,32 +99,8 @@ var createParticle = function (options) {
 		}
 	};
 
-	if (options.isPlayer) collider.addTarget.call(collider, particle); // l33t h4x for Closure Compiler
-
+	if (options.isPlayer) collisionTargets.push(particle);
 	particles.push(particle);
-};
-
-var collider = {
-	targets: [],
-
-	addTarget: function (target) {
-		target.isTarget = true;
-		this.targets.push(target);
-	},
-
-	removeTarget: function (target) {
-		this.targets = this.targets.filter(function (t) {
-			return target !== t;
-		});
-	},
-
-	detect: function (collidable) {
-		if (collidable.isTarget || collidable.isReversing || !isGameActive) return;
-
-		for (var i in this.targets) {
-			this.targets[i].detectCollision(collidable) && this.targets[i].onHit && this.targets[i].onHit(collidable);
-		}
-	}
 };
 
 a.onmousemove = function (e) {
@@ -136,14 +109,17 @@ a.onmousemove = function (e) {
 };
 
 // Closure Compiler hax
-collider.addTarget.call(collider, shield);
+collisionTargets.push(shield);
 
 createParticle({
 	isPlayer: true,
 	radius: 45,
 	x: 400,
 	y: 240,
-	onHit: gameOver,
+	onHit: function () {
+		this.cleanup = true;
+		isGameActive = false;
+	},
 	detectCollision: function (collidable) {
 		return detectRadialCollision(this, collidable);
 	}
@@ -160,12 +136,6 @@ var onScore = function() {
 }
 
 loop();
-
-var gameOver = function() {
-	this.cleanup = true;
-	collider.removeTarget(this);
-	isGameActive = false;
-}
 
 var loop = function(ts) {
 	c.fillStyle = '#000';
@@ -189,10 +159,20 @@ var loop = function(ts) {
 			particles[i].cleanup = particles[i].detectCleanup();
 		}
 
-		collider.detect(particles[i]);
+		// collider.detect
+		if (!particles[i].isTarget && !particles[i].isReversing && isGameActive) {
+
+			for (var j in collisionTargets) {
+				!collisionTargets[j].cleanup && collisionTargets[j].detectCollision(particles[i]) && collisionTargets[j].onHit && collisionTargets[j].onHit(particles[i]);
+			}
+		}
 	}
 
-	shield.render();
+	// shield.render()
+	c.strokeStyle = '#fff';
+	c.beginPath();
+	c.arc(shield.x, shield.y, shield.radius, shield.getAngles().s, shield.getAngles().e);
+	c.stroke();
 	
 	c.fillStyle = '#fff';
 	c.font = '26px Arial';

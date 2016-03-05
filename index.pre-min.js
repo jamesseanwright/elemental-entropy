@@ -11,27 +11,20 @@
  * - c - a's 2D context
  * - g - a's 3D context */
 
-var PLAYER_X = 800 / 2;
-var PLAYER_Y = 480 / 2;
-var PLAYER_RADIUS = 45;
-var LEVEL_INCREASE_THRESHOLD = 100;
-var HIT_SCORE = 10;
-var H_PADDING = 100;
-
 var score = 0;
 var level = 0;
 var isGameActive = true;
 
 var shield = {
 	init: function () {
-		this.x = PLAYER_X;
-		this.y = PLAYER_Y;
+		this.x = 800 / 2;
+		this.y = 480 / 2;
 		this.angle = 0;
-		this.radius = PLAYER_RADIUS + 30;
+		this.radius = 45 + 30;
 
 		a.onmousemove = function (e) {
 			// hax for RegPack :(
-			(e.clientX > H_PADDING && e.clientX < 800 - H_PADDING) && shield.r(e);
+			(e.clientX > 100 && e.clientX < 700) && shield.r(e);
 		};
 	},
 	
@@ -54,7 +47,7 @@ var shield = {
 	},
 
 	detectCollision: function (collidable) {
-		return detectRadialCollision(this, collidable) && (Math.atan2(collidable.y - PLAYER_Y, collidable.x - PLAYER_X) >= this.getAngles().s && Math.atan2(collidable.y - PLAYER_Y, collidable.x - PLAYER_X) <= this.getAngles().e);
+		return detectRadialCollision(this, collidable) && (Math.atan2(collidable.y - (480 / 2), collidable.x - (800 / 2)) >= this.getAngles().s && Math.atan2(collidable.y - (480 / 2), collidable.x - (800 / 2)) <= this.getAngles().e);
 	},
 
 	onHit: function (collidable) {
@@ -147,8 +140,8 @@ Particle.prototype.render = function () {
 };
 
 Particle.prototype.setSpeed = function () {
-	this.xSpeed = Particle.SPEED * ((PLAYER_X - this.x) / PLAYER_X);
-	this.ySpeed = (Particle.SPEED * ((PLAYER_Y - this.y) / PLAYER_Y)) * 480 / 800;
+	this.xSpeed = Particle.SPEED * (((800 / 2) - this.x) / (800 / 2));
+	this.ySpeed = (Particle.SPEED * (((480 / 2) - this.y) / (480 / 2))) * 480 / 800;
 };
 
 Particle.prototype.setPos = function (options) {
@@ -214,9 +207,9 @@ collider.addTarget.call(collider, shield);
 
 Particle.create({
 	isPlayer: true,
-	radius: PLAYER_RADIUS,
-	x: PLAYER_X,
-	y: PLAYER_Y,
+	radius: 45,
+	x: (800 / 2),
+	y: (480 / 2),
 	onHit: gameOver,
 	detectCollision: function (collidable) {
 		return detectRadialCollision(this, collidable);
@@ -228,9 +221,9 @@ var detectRadialCollision = function (p1, p2) {
 }
 
 var onScore = function() {
-	score += HIT_SCORE;
+	score += 10;
 
-	if (score % LEVEL_INCREASE_THRESHOLD === 0) level++;
+	if (score % 100 === 0) level++;
 }
 
 loop();
@@ -257,5 +250,5 @@ var renderHUD = function() {
 	c.font = '26px Arial';
 	c.fillText(score, 20, 40);
 
-	if (!isGameActive) c.fillText('BOOM', PLAYER_X - 40, PLAYER_Y);
+	if (!isGameActive) c.fillText('BOOM', (800 / 2) - 40, (480 / 2));
 }

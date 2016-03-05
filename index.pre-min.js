@@ -145,7 +145,7 @@ var loop = function(ts) {
 		if (!particles[i].isTarget && !particles[i].isReversing && isGameActive) {
 
 			for (var j in collisionTargets) {
-				!collisionTargets[j].cleanup && collisionTargets[j].detectCollision(particles[i]) && collisionTargets[j].onHit && collisionTargets[j].onHit(particles[i]);
+				!collisionTargets[j].cleanup && collisionTargets[j].detectCollision(particles[i]) && collisionTargets[j].onHit(particles[i]);
 			}
 		}
 	}

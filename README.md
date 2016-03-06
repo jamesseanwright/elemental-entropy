@@ -10,7 +10,7 @@ Will provide a link once it has been submitted and accepted
 
 ## How to Play
 
-Simply move the mouse left and right to rotate the shield around the oxygen particle. You'll score 10 points for every full and heat particle you deflect.
+Simply move the mouse left and right to rotate the shield around the oxygen particle. You'll score 10 points for every fuel and heat particle you deflect.
 
 
 ## Browser Support

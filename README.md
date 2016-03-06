@@ -7,7 +7,7 @@ A HTML5 canvas game for [JS1K 2016](http://js1k.com/2016-elemental/). Uses Web A
 
 ## Play Online
 
-Will provide a link once it has been submitted and accepted
+http://jamesseanwright.github.io/elemental-entropy/
 
 
 ## How to Play

@@ -57,7 +57,7 @@ A version of the original source that contains all of the logic in the game loop
 
 #### `index.pre-crush.js`
 
-The result of running the `build-pre-crush.sh` script against `index.pre-min.js`. Additionally, all instances of the `var` keyword are removed by hand, thus placing everything on the global scope.
+The result of running the `build-pre-crush.sh` script against `index.pre-min.js`. Additionally, all instances of the `var` keyword are removed by hand, thus placing everything on the global object.
 
 
 #### `index.crushed.js`

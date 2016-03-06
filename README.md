@@ -1,4 +1,4 @@
-# Elemental Extravaganza
+# Elemental Entropy
 
 A HTML5 canvas game for [JS1K 2016](http://js1k.com/2016-elemental/). Uses Web Audio API's [`OscillatorNode`](https://developer.mozilla.org/en-US/docs/Web/API/OscillatorNode) for sound. Protect the combustable oxygen from heat and fuel!
 

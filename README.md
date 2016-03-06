@@ -17,8 +17,10 @@ Simply move the mouse left and right to rotate the shield around the oxygen part
 
 This goes without saying really, but FYI - mouse === desktop only :(
 	
-* Chrome/Chromium - version 43+
-* Firefox - 
+* Chrome/Chromium
+* Firefox
+* Edge
+* Maybe Safari (TBC)
 
 
 ## Technical Stuff

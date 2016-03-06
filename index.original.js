@@ -11,6 +11,7 @@
  * - c - a's 2D context
  * - g - a's 3D context */
 
+var CTX = new AudioContext();
 var PLAYER_X = a.width / 2;
 var PLAYER_Y = a.height / 2;
 var PLAYER_RADIUS = 45;
@@ -21,6 +22,14 @@ var H_PADDING = 100;
 var score = 0;
 var level = 0;
 var isGameActive = true;
+
+function oscillate(frequency, duration) {
+	var oscillator = CTX.createOscillator();
+	oscillator.frequency.value = frequency;
+	oscillator.connect(CTX.destination);
+	oscillator.start(CTX.currentTime);
+	oscillator.stop(CTX.currentTime + duration);
+}
 
 var shield = {
 	init: function () {
@@ -77,6 +86,7 @@ var shield = {
 		collidable.ySpeed = ySpeed > 0 ? -(ySpeed) : Math.abs(ySpeed);
 
 		onScore();
+		oscillate(190, 0.1);
 	}
 };
 
@@ -284,6 +294,7 @@ var gameOver = function() {
 	this.cleanup = true;
 	collider.removeTarget(this);
 	isGameActive = false;
+	oscillate(150, 2);
 }
 
 var loop = function() {

@@ -35,12 +35,12 @@ Runs [Closure Compiler](https://developers.google.com/closure/compiler/) (`closu
 
 None of the other steps are automated. Once `index.pre-crush.js`is built, everything else is manual; remove the four `var` declarations from the file, and then run it through the incredible [RegPack](http://siorki.github.io/regPack.html) (I couldn't get the npm module to work, unfortunately) with these options:
 
-* Attempt method hashing and renaming for *2D canvas context*
-* Assume global variable *c* is a *2D canvas context*
-* Reassign variable names to produce consecutive character blocks, except for variables *a c*
-* Score = 1
-* Gain = 0
-* Length = 0
+* Attempt method hashing and renaming for **2D canvas context**
+* Assume global variable **c** is a **2D canvas context**
+* Reassign variable names to produce consecutive character blocks, except for variables **a c**
+* Score = **1**
+* Gain = **0**
+* Length = **0**
 
 
 ### The Scripts

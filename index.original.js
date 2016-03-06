@@ -263,6 +263,13 @@ var collider = {
 shield.init();
 collider.addTarget.call(collider, shield);
 
+var gameOver = function() {
+	this.cleanup = true;
+	collider.removeTarget(this);
+	isGameActive = false;
+	oscillate(150, 2);
+};
+
 Particle.create({
 	isPlayer: true,
 	radius: PLAYER_RADIUS,
@@ -280,20 +287,13 @@ var detectRadialCollision = function (p1, p2) {
 	var distance = Math.sqrt(distanceX * distanceX + distanceY * distanceY);
 	
 	return distance < p1.radius + p2.radius;
-}
+};
 
 var onScore = function() {
 	score += HIT_SCORE;
 
 	if (score % LEVEL_INCREASE_THRESHOLD === 0) level++;
-}
-
-var gameOver = function() {
-	this.cleanup = true;
-	collider.removeTarget(this);
-	isGameActive = false;
-	oscillate(150, 2);
-}
+};
 
 var loop = function() {
 	c.fillStyle = 'black';
@@ -304,7 +304,7 @@ var loop = function() {
 	renderHUD();
 
 	requestAnimationFrame(loop);
-}
+};
 
 var renderHUD = function() {
 	c.fillStyle = 'white';
@@ -312,6 +312,6 @@ var renderHUD = function() {
 	c.fillText(score + ' - lvl ' + level, 20, 40);
 
 	if (!isGameActive) c.fillText('GAME OVER', PLAYER_X - 80, PLAYER_Y);
-}
+};
 
 loop();

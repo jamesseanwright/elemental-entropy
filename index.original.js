@@ -288,8 +288,6 @@ var onScore = function() {
 	if (score % LEVEL_INCREASE_THRESHOLD === 0) level++;
 }
 
-loop();
-
 var gameOver = function() {
 	this.cleanup = true;
 	collider.removeTarget(this);
@@ -315,3 +313,5 @@ var renderHUD = function() {
 
 	if (!isGameActive) c.fillText('GAME OVER', PLAYER_X - 80, PLAYER_Y);
 }
+
+loop();

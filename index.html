@@ -122,10 +122,323 @@
       var TOKEN_RELOAD_ONORIENTATIONCHANGE = true;
     </script>
     <script type="demo">
-b=new AudioContext,f=0,g=0,k=0,l=[],m=0,n=["#f60","#088"];a.onmousemove=function(e){100<e.clientX&&700>e.clientX&&(k=(e.clientX-800)/800*Math.PI*2+Math.PI)};p=!0;
-function q(e){c.fillStyle="#000";c.fillRect(0,0,800,480);if(e-m>=1500-100*g){h=!(Math.random()+.5|0),r=h?800*Math.random():Math.random()+.5|0?825:-25,h=h?Math.random()+.5|0?505:-25:Math.random()+.5|0?480-(80-80*Math.random()):80-80*Math.random();l.push({x:r,y:h,b:(400-r)/400*5,f:(240-h)/240*3,fill:n[Math.random()*n.length|0]});m=e}p&&(c.fillStyle="#00f",c.shadowColor="#00f",c.shadowBlur=100,c.beginPath(),c.arc(400,240,45,0,2*Math.PI),c.fill());for(d in l)l[d]&&(c.fillStyle=l[d].fill,c.shadowColor=
-l[d].fill,c.shadowBlur=100,c.beginPath(),c.arc(l[d].x,l[d].y,25,0,2*Math.PI),c.fill(),l[d].x+=l[d].b,l[d].y+=l[d].f,p&&70>Math.sqrt((400-l[d].x)*(400-l[d].x)+(240-l[d].y)*(240-l[d].y))&&(p=!1,e=b.createOscillator(),e.frequency.value=150,e.connect(b.destination),e.start(b.currentTime),e.stop(b.currentTime+2)),p&&!l[d].g&&100>Math.sqrt((400-l[d].x)*(400-l[d].x)+(240-l[d].y)*(240-l[d].y))&&Math.atan2(l[d].y-240,l[d].x-400)>=k-Math.PI/4&&Math.atan2(l[d].y-240,l[d].x-400)<=k+Math.PI/4&&(l[d].g=!0,l[d].b=
--1*l[d].b,l[d].f=-1*l[d].f,f+=10,0===f%100&&g++,e=b.createOscillator(),e.frequency.value=190,e.connect(b.destination),e.start(b.currentTime),e.stop(b.currentTime+.1)),826<l[d].x||-26>l[d].x||506<l[d].y||-26>l[d].y)&&(l[d]=void 0);c.strokeStyle="#fff";c.beginPath();c.arc(400,240,75,k-Math.PI/4,k+Math.PI/4);c.stroke();c.fillStyle="#fff";c.font="26px Arial";c.fillText(f,20,40);requestAnimationFrame(q)}q();
+/* This software is protected by version 2 of
+ * the Apache License. If you fork and modify it,
+ * please attribute me as the author of the original
+ * project. You can of course protect your own modifications
+ * as and how you please. http://www.apache.org/licenses/LICENSE-2.0.txt
+
+ * The JS1K guys have made life easier by providing
+ * the following shim:
+ * - a - a canvas element
+ * - b - the body
+ * - c - a's 2D context
+ * - g - a's 3D context */
+
+var CTX = new AudioContext();
+var PLAYER_X = a.width / 2;
+var PLAYER_Y = a.height / 2;
+var PLAYER_RADIUS = 45;
+var LEVEL_INCREASE_THRESHOLD = 100;
+var HIT_SCORE = 10;
+var H_PADDING = 100;
+
+var score = 0;
+var level = 0;
+var isGameActive = true;
+
+function oscillate(frequency, duration) {
+	var oscillator = CTX.createOscillator();
+	oscillator.frequency.value = frequency;
+	oscillator.connect(CTX.destination);
+	oscillator.start(CTX.currentTime);
+	oscillator.stop(CTX.currentTime + duration);
+}
+
+var shield = {
+	init: function () {
+		this.x = PLAYER_X;
+		this.y = PLAYER_Y;
+		this.angle = 0;
+		this.radius = PLAYER_RADIUS + 30;
+
+		a.addEventListener('mousemove', function (e) {
+			// hax for RegPack :(
+			(e.clientX > H_PADDING && e.clientX < a.width - H_PADDING) && shield.rotate(e);
+		});
+	},
+	
+	rotate: function (e) {
+		var distanceFromX = e.clientX - a.width;
+		this.angle = (Math.PI * 2) * (distanceFromX / a.width) + Math.PI;
+	},
+
+	render: function () {
+		var angles = this.getAngles();
+
+		c.strokeStyle = 'white';
+		c.beginPath();
+		c.arc(this.x, this.y, this.radius, angles.start, angles.end);
+		c.stroke();
+	},
+
+	getAngles: function () {
+		return {
+			start: this.angle - Math.PI / 4,
+			end: this.angle + Math.PI / 4
+		};
+	},
+
+	detectCollision: function (collidable) {
+		var shieldAngles;
+		var collidableAngle;
+
+		if (!detectRadialCollision(this, collidable)) return false;
+		
+		shieldAngles = this.getAngles();
+		collidableAngle = Math.atan2(collidable.y - PLAYER_Y, collidable.x - PLAYER_X);
+		return collidableAngle >= shieldAngles.start && collidableAngle <= shieldAngles.end;
+	},
+
+	onHit: function (collidable) {
+		var xSpeed = collidable.xSpeed;
+		var ySpeed = collidable.ySpeed;
+
+		collidable.isReversing = true;
+
+		collidable.xSpeed = xSpeed > 0 ? -(xSpeed) : Math.abs(xSpeed);
+		collidable.ySpeed = ySpeed > 0 ? -(ySpeed) : Math.abs(ySpeed);
+
+		onScore();
+		oscillate(190, 0.1);
+	}
+};
+
+var Particle = function(options) {
+	options = options || {};
+	this.isPlayer = options.isPlayer;
+	this.radius = options.radius || Particle.RADIUS;
+	this.fill = Particle.generateFill(this.isPlayer);
+	this.onHit = options.onHit;
+	this.detectCollision = options.detectCollision;
+
+	this.setPos(options);
+	this.setSpeed();
+
+	if (this.isPlayer) collider.addTarget.call(collider, this); // l33t h4x for Closure Compiler
+}
+
+Particle.SPEED = 5;
+Particle.RADIUS = 25;
+Particle.GENERATION_FREQUENCY_MS = 1500;
+Particle.BLUE = 100;
+Particle.GEN_DEDUCTION_MS = 100;
+
+Particle.instances = [];
+Particle.lastGeneration = Date.now() - Particle.GENERATION_FREQUENCY_MS;
+
+Particle.fills = {
+	player: 'blue',
+	other: ['orange', '#008080']
+};
+
+Particle.generateFill = function (isPlayer) {
+	var other = Particle.fills.other;
+
+	return isPlayer 
+		? Particle.fills.player
+		: other[Math.floor(Math.random() * other.length)];
+};
+
+Particle.generatePos = function (length) {
+	return Math.random() * length;
+};
+
+Particle.create = function (options) {
+	Particle.instances.push(new Particle(options));
+};
+
+Particle.next = function () {
+	Particle.cleanup();
+	Particle.tryGenerate();
+
+	for (var i in Particle.instances) {
+		var particle = Particle.instances[i];
+		particle.render();
+
+		if (!particle.isTarget) {
+			particle.move();
+			particle.cleanup = particle.detectCleanup();
+		}
+
+		collider.detect(particle);
+	}
+};
+
+Particle.cleanup = function () {
+	Particle.instances = Particle.instances.filter(function (p) { 
+		return !p.cleanup;
+	});
+};
+
+Particle.tryGenerate = function () {
+	var now = Date.now();
+	var frequency = Particle.GENERATION_FREQUENCY_MS - (Particle.GEN_DEDUCTION_MS * level);
+
+	var shouldGenerate = now - Particle.lastGeneration >= frequency;
+
+	if (shouldGenerate) {
+		Particle.create();
+		Particle.lastGeneration = now;
+	}
+};
+
+Particle.prototype.render = function () {
+	c.fillStyle = this.fill;
+	c.shadowColor = this.fill;
+	c.shadowBlur = Particle.BLUE;
+	c.beginPath();
+	c.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+	c.fill();
+};
+
+Particle.prototype.setSpeed = function () {
+	var distanceFromX = PLAYER_X - this.x;
+	var distanceFromY = PLAYER_Y - this.y;
+	var aspectRatio =  a.height / a.width;
+
+	this.xSpeed = Particle.SPEED * (distanceFromX / PLAYER_X);
+	this.ySpeed = (Particle.SPEED * (distanceFromY / PLAYER_Y)) * aspectRatio;
+};
+
+Particle.prototype.setPos = function (options) {
+	var isX;
+	var hasCustomPos = options.x && options.y;
+
+	if (hasCustomPos) {
+		this.x = options.x;
+		this.y = options.y;
+		return;
+	}
+
+	isX = Math.round(Math.random()) === 0;
+
+	if (isX) {
+		this.x = Math.random() * a.width;
+		this.y = this.getStartPos(a.width);
+	} else {
+		// nasty hack to overcome shield dead spot bug :(
+		var preCentre = Math.round(Math.random()) === 0;
+		var start = a.height / 6;
+		start = start - Math.random() * start;
+
+		this.y = preCentre ? start : a.height - start;
+		this.x = this.getStartPos(a.width);
+	}
+};
+
+Particle.prototype.getStartPos = function (length) {
+	var fromZero = Math.round(Math.random()) === 0;
+
+	return fromZero ? 0 - this.radius : length + this.radius;
+};
+
+Particle.prototype.move = function () {
+	this.x += this.xSpeed;
+	this.y += this.ySpeed;
+};
+
+Particle.prototype.detectCleanup = function () {
+	var boundBuffer = 1;
+	var isOutOfBounds = this.x > a.width + this.radius + boundBuffer
+						|| this.x < 0 - (this.radius + boundBuffer)
+						|| this.y > a.height + this.radius + boundBuffer
+						|| this.y < 0 - (this.radius + boundBuffer);
+
+	return isOutOfBounds;
+};
+
+var collider = {
+	targets: [],
+
+	addTarget: function (target) {
+		target.isTarget = true;
+		this.targets.push(target);
+	},
+
+	removeTarget: function (target) {
+		this.targets = this.targets.filter(function (t) {
+			return target !== t;
+		});
+	},
+
+	detect: function (collidable) {
+		if (collidable.isTarget || collidable.isReversing || !isGameActive) return;
+
+		for (var i in this.targets) {
+			var target = this.targets[i];
+			var isHit = target.detectCollision(collidable);
+
+			if (isHit && target.onHit) target.onHit(collidable);
+		}
+	}
+};
+
+shield.init();
+collider.addTarget.call(collider, shield);
+
+Particle.create({
+	isPlayer: true,
+	radius: PLAYER_RADIUS,
+	x: PLAYER_X,
+	y: PLAYER_Y,
+	onHit: gameOver,
+	detectCollision: function (collidable) {
+		return detectRadialCollision(this, collidable);
+	}
+});
+
+var detectRadialCollision = function (p1, p2) {
+	var distanceX = p1.x - p2.x;
+	var distanceY = p1.y - p2.y;
+	var distance = Math.sqrt(distanceX * distanceX + distanceY * distanceY);
+	
+	return distance < p1.radius + p2.radius;
+}
+
+var onScore = function() {
+	score += HIT_SCORE;
+
+	if (score % LEVEL_INCREASE_THRESHOLD === 0) level++;
+}
+
+var gameOver = function() {
+	this.cleanup = true;
+	collider.removeTarget(this);
+	isGameActive = false;
+	oscillate(150, 2);
+}
+
+var loop = function() {
+	c.fillStyle = 'black';
+	c.fillRect(0, 0, a.width, a.height);
+
+	Particle.next();
+	shield.render();
+	renderHUD();
+
+	requestAnimationFrame(loop);
+}
+
+var renderHUD = function() {
+	c.fillStyle = 'white';
+	c.font = '26px ARIAL';
+	c.fillText(score + ' - lvl ' + level, 20, 40);
+
+	if (!isGameActive) c.fillText('GAME OVER', PLAYER_X - 80, PLAYER_Y);
+}
+
+loop();
     </script>
     <script>
       (function(){var doc=document;var header=doc.getElementsByTagName("header")[0];var firstChild=header.firstChild;var p=doc.getElementsByClassName("p")[0];

@@ -22,7 +22,7 @@ This goes without saying really, but FYI - mouse === desktop only :(
 * Chrome/Chromium
 * Firefox
 * Edge
-* Maybe Safari (TBC)
+* ~Safari~ - mouse movement is too poor
 
 For the smoothest gameplay possible, ensure that hardware acceleration is enabled in your browser.
 

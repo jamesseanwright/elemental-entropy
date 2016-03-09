@@ -76,8 +76,8 @@ var shield = {
 
 		collidable.isReversing = true;
 
-		collidable.xSpeed = xSpeed > 0 ? -(xSpeed) : Math.abs(xSpeed);
-		collidable.ySpeed = ySpeed > 0 ? -(ySpeed) : Math.abs(ySpeed);
+		collidable.xSpeed *= -1
+		collidable.ySpeed *= -1
 
 		onScore();
 		oscillate(190, 0.1);

@@ -87,8 +87,8 @@ var loop = function (ts) {
 			// collider.detect (shield)
 			if (player && !particles[i].isReversing && (Math.sqrt((400 - particles[i].x) * (400 - particles[i].x) + (240 - particles[i].y) * (240 - particles[i].y)) < 75 + 25) && (Math.atan2(particles[i].y - (240), particles[i].x - (800 / 2)) >= (angle - Math.PI / 4) && Math.atan2(particles[i].y - (240), particles[i].x - (800 / 2)) <= (angle + Math.PI / 4))) {
 				particles[i].isReversing = true;
-				particles[i].xSpeed = particles[i].xSpeed * -1; // much easier than Math.abs and -() :D
-				particles[i].ySpeed = particles[i].ySpeed * -1;
+				particles[i].xSpeed *= -1; // much easier than Math.abs and -() :D
+				particles[i].ySpeed *= -1;
 
 				score += 10;
 				if (score % 100 === 0) level++;
